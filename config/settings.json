@@ -1,0 +1,5 @@
+{
+  "output_dir": "./archive",
+  "collector": "apify",
+  "download_videos": true
+}
