@@ -1,3 +1,10 @@
 def get_data():
-    # placeholder for Apify collector
-    return []
+    return [
+        {
+            "id": "test123",
+            "url": "https://example.com/video",
+            "author": "testuser",
+            "caption": "This is a test video",
+            "likes": 100
+        }
+    ]
