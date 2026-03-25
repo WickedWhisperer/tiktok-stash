@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install requests
 
       - name: Debug token presence
@@ -36,8 +37,11 @@ jobs:
             echo "APIFY_TOKEN is set"
           fi
 
-      - name: Run archive script
+      - name: Run TikTok collector
         run: python main.py
+
+      - name: Normalize archive
+        run: python normalize.py
 
       - name: Upload archive output
         uses: actions/upload-artifact@v4
