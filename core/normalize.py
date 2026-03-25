@@ -4,22 +4,41 @@ import os
 ARCHIVE_DIR = "archive"
 OUTPUT_FILE = os.path.join(ARCHIVE_DIR, "normalized_archive.json")
 
+
 def load_all_json_files(directory):
     all_items = []
+
     for filename in os.listdir(directory):
         if filename.endswith(".json") and not filename.startswith("normalized"):
             path = os.path.join(directory, filename)
+
             with open(path, "r", encoding="utf-8") as f:
                 try:
                     data = json.load(f)
-                    all_items.extend(data)
+
+                    # Handle different data types safely
+                    if isinstance(data, list):
+                        all_items.extend(data)
+                    elif isinstance(data, dict):
+                        all_items.append(data)
+                    else:
+                        print(f"Skipping {filename}: invalid type {type(data)}")
+
                 except Exception as e:
                     print(f"Error reading {filename}: {e}")
+
     return all_items
+
 
 def normalize_items(items):
     normalized = []
+
     for item in items:
+        # Skip invalid entries
+        if not isinstance(item, dict):
+            print(f"Skipping invalid item: {type(item)}")
+            continue
+
         normalized.append({
             "id": item.get("id") or item.get("videoMeta", {}).get("id"),
             "author": item.get("authorMeta", {}).get("name"),
@@ -38,26 +57,43 @@ def normalize_items(items):
             "platform": item.get("platform") or "tiktok",
             "raw": item
         })
+
     return normalized
+
 
 def remove_duplicates(items):
     seen_ids = set()
     unique_items = []
+
     for item in items:
-        if item["id"] not in seen_ids:
+        item_id = item.get("id")
+
+        # Skip items without ID
+        if not item_id:
+            continue
+
+        if item_id not in seen_ids:
             unique_items.append(item)
-            seen_ids.add(item["id"])
+            seen_ids.add(item_id)
+
     return unique_items
+
 
 def main():
     all_items = load_all_json_files(ARCHIVE_DIR)
+
+    print(f"Loaded {len(all_items)} raw items")
+
     normalized = normalize_items(all_items)
     unique_items = remove_duplicates(normalized)
-    
+
+    os.makedirs(ARCHIVE_DIR, exist_ok=True)
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(unique_items, f, ensure_ascii=False, indent=2)
-    
+
     print(f"Normalized archive created: {OUTPUT_FILE} ({len(unique_items)} items)")
+
 
 if __name__ == "__main__":
     main()
