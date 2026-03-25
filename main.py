@@ -1,6 +1,5 @@
 import json
 from collectors.apify_collector import run_apify_actor
-from core.normalize import normalize
 from core.save_item import save_item
 
 def main():
@@ -12,9 +11,9 @@ def main():
     else:
         raise Exception("Unsupported collector")
 
+    # Save RAW items only
     for item in items:
-        normalized = normalize(item)
-        save_item(normalized)
+        save_item(item)
 
 if __name__ == "__main__":
     main()
