@@ -10,6 +10,9 @@ jobs:
   archive:
     runs-on: ubuntu-latest
 
+    env:
+      APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -22,7 +25,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install requests
+
+      - name: Debug token presence
+        run: |
+          if [ -z "$APIFY_TOKEN" ]; then
+            echo "APIFY_TOKEN is NOT set"
+            exit 1
+          else
+            echo "APIFY_TOKEN is set"
+          fi
 
       - name: Run archive script
         run: python main.py
