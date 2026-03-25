@@ -1,13 +1,17 @@
-import os
 import json
+import os
+from datetime import datetime
 
 ARCHIVE_DIR = "archive"
-
 
 def save_item(item):
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
-    file_path = os.path.join(ARCHIVE_DIR, f"{item['id']}.json")
+    # Create unique filename per run
+    filename = f"tiktok_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}.json"
+    path = os.path.join(ARCHIVE_DIR, filename)
 
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(item, f, indent=2, ensure_ascii=False)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(item, f, ensure_ascii=False, indent=2)
+
+    print(f"Saved: {filename}")
