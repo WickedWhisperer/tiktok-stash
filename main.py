@@ -1,7 +1,7 @@
 import json
 from collectors.apify_collector import run_apify_actor
 from core.normalize import normalize
-from core.save import save_item
+from core.save_item import save_item
 
 def main():
     with open("config/settings.json") as f:
