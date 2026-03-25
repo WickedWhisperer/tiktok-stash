@@ -1,16 +1,13 @@
-import json
 import os
+import json
 
-def save(video, base_dir):
-    user = video.get("author", "unknown")
-    video_id = video.get("id")
+ARCHIVE_DIR = "archive"
 
-    folder = os.path.join(base_dir, user, "videos")
-    os.makedirs(folder, exist_ok=True)
 
-    path = os.path.join(folder, f"{video_id}.json")
+def save_item(item):
+    os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
-    with open(path, "w") as f:
-        json.dump(video, f, indent=4)
+    file_path = os.path.join(ARCHIVE_DIR, f"{item['id']}.json")
 
-    return path
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(item, f, indent=2, ensure_ascii=False)
