@@ -7,7 +7,7 @@ ACTOR_ID = "clockworks/tiktok-scraper"
 
 
 def run_apify_actor(input_data):
-    url = f"https://api.apify.com/v2/acts/{ACTOR_ID}/run-sync-get-dataset-items?token={APIFY_TOKEN}"
+    url = f"https://api.apify.com/v2/acts/clockworks~tiktok-scraper/runs?token={APIFY_TOKEN}"
 
     response = requests.post(url, json=input_data)
 
