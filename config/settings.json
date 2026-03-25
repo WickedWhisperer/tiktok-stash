@@ -1,5 +1,13 @@
 {
-  "output_dir": "./archive",
   "collector": "apify",
-  "download_videos": true
+  "input": {
+    "profiles": ["flamrzz"],
+    "profileScrapeSections": ["videos"],
+    "profileSorting": "latest",
+    "resultsPerPage": 5,
+    "maxProfilesPerQuery": 1,
+    "shouldDownloadVideos": false,
+    "shouldDownloadSubtitles": false,
+    "shouldDownloadCovers": false
+  }
 }
