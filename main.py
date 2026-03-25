@@ -1,23 +1,20 @@
-from collectors.apify_collector import get_data
-from core.normalize import normalize
-from core.save_item import save
-from core.tracker import is_downloaded, mark_downloaded
-
 import json
+from collectors.apify_collector import run_apify_actor
+from core.normalize import normalize
+from core.save import save_item
 
-with open("config/settings.json") as f:
-    config = json.load(f)
+def main():
+    with open("config/settings.json") as f:
+        config = json.load(f)
 
-data = get_data()
+    if config["collector"] == "apify":
+        items = run_apify_actor(config["input"])
+    else:
+        raise Exception("Unsupported collector")
 
-for video in data:
-    video = normalize(video)
+    for item in items:
+        normalized = normalize(item)
+        save_item(normalized)
 
-    if is_downloaded(video["id"]):
-        continue
-
-    save(video, config["output_dir"])
-
-    mark_downloaded(video["id"])
-
-print("Done")
+if __name__ == "__main__":
+    main()
