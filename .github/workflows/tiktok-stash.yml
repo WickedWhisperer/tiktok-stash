@@ -41,7 +41,7 @@ jobs:
         run: python main.py
 
       - name: Normalize archive
-        run: python normalize.py
+        run: python core/normalize.py
 
       - name: Upload archive output
         uses: actions/upload-artifact@v4
