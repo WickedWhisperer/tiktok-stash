@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: write   # THIS FIXES THE 403 ERROR
+  contents: write
 
 jobs:
   archive:
@@ -19,6 +19,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clean previous generated archive files
+        run: |
+          mkdir -p archive
+          find archive -maxdepth 1 -type f -name '*.json' -delete
 
       - name: Set up Python
         uses: actions/setup-python@v5
