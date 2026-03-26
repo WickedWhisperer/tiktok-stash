@@ -1,93 +1,112 @@
 import json
+import os
 from pathlib import Path
 
-ARCHIVE_DIR = Path("archive")
-OUTPUT_FILE = ARCHIVE_DIR / "search_index.json"
+INPUT_FILE = Path("archive/normalized_archive.json")
+OUTPUT_FILE = Path("archive/search_index.json")
 
 
-def safe_get(obj, *keys):
-    for k in keys:
-        if isinstance(obj, dict) and k in obj:
-            return obj[k]
-    return None
+def extract_text_list(value):
+    if value is None:
+        return []
+
+    if isinstance(value, str):
+        return [value]
+
+    if isinstance(value, dict):
+        candidate = (
+            value.get("name")
+            or value.get("title")
+            or value.get("text")
+            or value.get("username")
+            or value.get("id")
+        )
+        return [str(candidate)] if candidate else []
+
+    if isinstance(value, list):
+        out = []
+        for item in value:
+            if isinstance(item, dict):
+                candidate = (
+                    item.get("name")
+                    or item.get("title")
+                    or item.get("text")
+                    or item.get("username")
+                    or item.get("id")
+                )
+                if candidate:
+                    out.append(str(candidate))
+            elif item is not None:
+                out.append(str(item))
+        return out
+
+    return []
 
 
 def build_index():
-    items = []
+    if not INPUT_FILE.exists():
+        print("No normalized archive found.")
+        return
 
-    for file in ARCHIVE_DIR.glob("*.json"):
-        if file.name == "search_index.json":
+    with open(INPUT_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, list):
+        raise Exception("normalized_archive.json must contain a list")
+
+    index = []
+
+    for item in data:
+        if not isinstance(item, dict):
             continue
 
-        with open(file, "r", encoding="utf-8") as f:
-            try:
-                data = json.load(f)
-            except:
-                continue
+        stats = item.get("stats", {}) or {}
+        hashtags = extract_text_list(item.get("hashtags"))
+        mentions = extract_text_list(item.get("mentions"))
+        music = item.get("music", {}) or {}
+        raw = item.get("raw", {}) or {}
 
-        if not isinstance(data, list):
-            continue
+        author_avatar = item.get("author_avatar") or raw.get("authorMeta", {}).get("avatar") or raw.get("authorMeta", {}).get("originalAvatarUrl")
 
-        for item in data:
-            # 🔥 handle Apify structure properly
-            author = safe_get(item, "author", "authorMeta", "authorName")
-            if isinstance(author, dict):
-                author = author.get("name")
+        music_name = music.get("title")
+        music_author = music.get("author")
 
-            avatar = safe_get(item, "authorAvatar", "author_avatar")
-            caption = safe_get(item, "text", "caption", "desc")
+        index.append({
+            "id": item.get("id"),
+            "author": item.get("author"),
+            "author_avatar": author_avatar,
+            "caption": item.get("caption"),
+            "created_at": item.get("created_at"),
+            "url": item.get("url"),
 
-            created = safe_get(item, "createTimeISO", "created_at")
+            "likes": stats.get("likes", 0),
+            "views": stats.get("views", 0),
+            "comments": stats.get("comments", 0),
+            "shares": stats.get("shares", 0),
+            "favorites": stats.get("favorites", 0),
 
-            url = safe_get(item, "webVideoUrl", "url")
+            "hashtags": hashtags,
+            "mentions": mentions,
 
-            stats = item.get("stats", {})
+            "music_name": music_name,
+            "music_author": music_author,
 
-            likes = safe_get(item, "diggCount") or stats.get("diggCount")
-            views = safe_get(item, "playCount") or stats.get("playCount")
-            comments = safe_get(item, "commentCount") or stats.get("commentCount")
-            shares = safe_get(item, "shareCount") or stats.get("shareCount")
-
-            music = item.get("musicMeta", {}) or {}
-
-            hashtags = []
-            mentions = []
-
-            if caption:
-                for word in caption.split():
-                    if word.startswith("#"):
-                        hashtags.append(word[1:])
-                    if word.startswith("@"):
-                        mentions.append(word[1:])
-
-            search_text = " ".join(filter(None, [
-                caption,
+            "search_text": " ".join([
+                str(item.get("caption", "")),
                 " ".join(hashtags),
-                author,
-                music.get("musicName"),
-                music.get("authorName")
-            ])).lower()
+                " ".join(mentions),
+                str(item.get("author", "")),
+                str(music_name or ""),
+                str(music_author or ""),
+            ]).lower()
+        })
 
-            items.append({
-                "id": item.get("id"),
-                "author": author,
-                "author_avatar": avatar,
-                "caption": caption,
-                "created_at": created,
-                "url": url,
-                "likes": likes or 0,
-                "views": views or 0,
-                "comments": comments or 0,
-                "shares": shares or 0,
-                "hashtags": hashtags,
-                "mentions": mentions,
-                "music_name": music.get("musicName"),
-                "music_author": music.get("authorName"),
-                "search_text": search_text
-            })
+    os.makedirs(OUTPUT_FILE.parent, exist_ok=True)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(items, f, ensure_ascii=False, indent=2)
+        json.dump(index, f, ensure_ascii=False, indent=2)
+
+    print(f"Search index created: {OUTPUT_FILE} ({len(index)} items)")
 
 
 if __name__ == "__main__":
