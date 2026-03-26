@@ -225,6 +225,16 @@
     flex-shrink: 0;
   }
 
+  .avatar-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: #222;
+  }
+
   .author-name {
     font-size: 13px;
     font-weight: 600;
@@ -265,6 +275,40 @@
     font-weight: 500;
   }
 
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .chip {
+    font-size: 11px;
+    border: 1px solid var(--dim);
+    border-radius: 999px;
+    padding: 4px 8px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .chip.hashtag {
+    color: var(--cyan);
+  }
+
+  .chip.mention {
+    color: var(--pink);
+  }
+
+  .music-row {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .music-row strong {
+    color: var(--text);
+  }
+
   .stats {
     display: flex;
     gap: 14px;
@@ -285,6 +329,7 @@
   .stat.likes { color: var(--pink); }
   .stat.views { color: #aaa; }
   .stat.comments { color: #aaa; }
+  .stat.shares { color: #aaa; }
 
   .card-link {
     display: inline-flex;
@@ -390,6 +435,7 @@
     <option value="likes">↓ Most liked</option>
     <option value="views">↓ Most viewed</option>
     <option value="comments">↓ Most commented</option>
+    <option value="shares">↓ Most shared</option>
     <option value="date_desc">↓ Newest first</option>
     <option value="date_asc">↑ Oldest first</option>
   </select>
@@ -468,7 +514,8 @@ function getStat(item, key) {
   const aliases = {
     likes: ['likes', 'diggCount'],
     views: ['views', 'playCount'],
-    comments: ['comments', 'commentCount']
+    comments: ['comments', 'commentCount'],
+    shares: ['shares', 'shareCount']
   };
 
   for (const k of (aliases[key] || [key])) {
@@ -477,25 +524,69 @@ function getStat(item, key) {
   return 0;
 }
 
+function toTextList(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map(v => {
+        if (typeof v === 'string') return v;
+        if (v && typeof v === 'object') {
+          return v.name || v.title || v.text || v.username || v.id || '';
+        }
+        return '';
+      })
+      .filter(Boolean);
+  }
+
+  if (typeof value === 'string') return [value];
+  return [];
+}
+
 function renderCard(item, query) {
   const likes = getStat(item, 'likes');
   const views = getStat(item, 'views');
   const comments = getStat(item, 'comments');
+  const shares = getStat(item, 'shares');
+
   const author = item.author || 'Unknown';
   const caption = item.caption || '';
   const url = item.url || '#';
   const dateStr = formatDate(item.created_at);
 
+  const avatarHtml = item.author_avatar
+    ? `<img class="avatar-img" src="${escHtml(item.author_avatar)}" alt="${escHtml(author)}" loading="lazy">`
+    : `<div class="avatar">${escHtml(initials(author))}</div>`;
+
+  const hashtags = toTextList(item.hashtags);
+  const mentions = toTextList(item.mentions);
+
+  const musicName = item.music_name || '';
+  const musicAuthor = item.music_author || '';
+  const musicLine = (musicName || musicAuthor)
+    ? `<div class="music-row">🎵 ${escHtml(musicName)}${musicName && musicAuthor ? ' · ' : ''}${escHtml(musicAuthor)}</div>`
+    : '';
+
+  const tagLine = (hashtags.length || mentions.length)
+    ? `<div class="chips">
+        ${hashtags.map(tag => `<span class="chip hashtag">#${escHtml(tag.replace(/^#/, ''))}</span>`).join('')}
+        ${mentions.map(tag => `<span class="chip mention">@${escHtml(tag.replace(/^@/, ''))}</span>`).join('')}
+      </div>`
+    : '';
+
   return `
     <div class="card">
       <div class="card-author">
-        <div class="avatar">${escHtml(initials(author))}</div>
+        ${avatarHtml}
         <div class="author-name">
           <a href="https://tiktok.com/@${encodeURIComponent(author)}" target="_blank" rel="noopener">@${escHtml(author)}</a>
         </div>
         <div class="card-date">${dateStr}</div>
       </div>
+
       <div class="card-caption">${styleCaptions(caption, query)}</div>
+
+      ${musicLine}
+      ${tagLine}
+
       <div class="stats">
         <div class="stat likes">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -509,7 +600,12 @@ function renderCard(item, query) {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           ${fmt(comments)}
         </div>
+        <div class="stat shares">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg>
+          ${fmt(shares)}
+        </div>
       </div>
+
       ${url !== '#' ? `<a class="card-link" href="${escHtml(url)}" target="_blank" rel="noopener">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Watch
@@ -612,4 +708,4 @@ document.getElementById('dateFilter').addEventListener('change', render);
 loadData();
 </script>
 </body>
-  </html>
+</html>
