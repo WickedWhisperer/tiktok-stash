@@ -22,10 +22,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Clean previous generated archive files
+      # ✅ Create proper folder structure (no deletion anymore)
+      - name: Ensure archive structure exists
         run: |
-          mkdir -p archive
-          find archive -maxdepth 1 -type f -name '*.json' -delete
+          mkdir -p archive/raw
+          mkdir -p archive/derived
+          mkdir -p archive/search
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Run TikTok collector
+      - name: Run TikTok collector (saves raw automatically)
         run: python main.py
 
       - name: Normalize archive
@@ -51,5 +53,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add archive/
-          git commit -m "Update archive data" || echo "No changes to commit"
+          git commit -m "Update archive data (new run)" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
