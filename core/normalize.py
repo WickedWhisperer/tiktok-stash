@@ -5,23 +5,68 @@ ARCHIVE_DIR = "archive"
 OUTPUT_FILE = os.path.join(ARCHIVE_DIR, "normalized_archive.json")
 
 
+def extract_text_list(value):
+    if value is None:
+        return []
+
+    if isinstance(value, str):
+        return [value]
+
+    if isinstance(value, dict):
+        candidate = (
+            value.get("name")
+            or value.get("title")
+            or value.get("text")
+            or value.get("username")
+            or value.get("id")
+        )
+        return [str(candidate)] if candidate else []
+
+    if isinstance(value, list):
+        out = []
+        for item in value:
+            if isinstance(item, dict):
+                candidate = (
+                    item.get("name")
+                    or item.get("title")
+                    or item.get("text")
+                    or item.get("username")
+                    or item.get("id")
+                )
+                if candidate:
+                    out.append(str(candidate))
+            elif item is not None:
+                out.append(str(item))
+        return out
+
+    return []
+
+
 def load_all_json_files(directory):
     all_items = []
-    for filename in os.listdir(directory):
-        if filename.endswith(".json") and not filename.startswith("normalized"):
-            path = os.path.join(directory, filename)
-            with open(path, "r", encoding="utf-8") as f:
-                try:
-                    data = json.load(f)
 
-                    # Handle both list and dict cases safely
-                    if isinstance(data, list):
-                        all_items.extend(data)
-                    elif isinstance(data, dict):
-                        all_items.append(data)
+    if not os.path.exists(directory):
+        return all_items
 
-                except Exception as e:
-                    print(f"Error reading {filename}: {e}")
+    for filename in sorted(os.listdir(directory)):
+        # Only consume raw collector outputs
+        if not (filename.startswith("tiktok_") and filename.endswith(".json")):
+            continue
+
+        path = os.path.join(directory, filename)
+
+        with open(path, "r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except Exception as e:
+                print(f"Error reading {filename}: {e}")
+                continue
+
+        if isinstance(data, list):
+            all_items.extend(data)
+        elif isinstance(data, dict):
+            all_items.append(data)
+
     return all_items
 
 
@@ -30,21 +75,21 @@ def normalize_items(items):
 
     for item in items:
         if not isinstance(item, dict):
-            continue  # skip broken entries safely
+            continue
+
+        raw_author = item.get("authorMeta", {})
+        raw_music = item.get("musicMeta", {})
+        raw_video = item.get("videoMeta", {})
 
         normalized.append({
             "id": item.get("id"),
-
-            "author": item.get("authorMeta", {}).get("name"),
-            "author_id": item.get("authorMeta", {}).get("id"),
-
+            "author": raw_author.get("name"),
+            "author_id": raw_author.get("id"),
+            "author_avatar": raw_author.get("avatar") or raw_author.get("originalAvatarUrl"),
             "caption": item.get("text"),
             "language": item.get("textLanguage"),
-
             "created_at": item.get("createTimeISO") or item.get("createTime"),
-
             "url": item.get("webVideoUrl"),
-
             "stats": {
                 "likes": item.get("diggCount", 0),
                 "shares": item.get("shareCount", 0),
@@ -53,27 +98,20 @@ def normalize_items(items):
                 "favorites": item.get("collectCount", 0),
                 "reposts": item.get("repostCount", 0),
             },
-
-            "hashtags": item.get("hashtags", []),
-            "mentions": item.get("mentions", []),
-
+            "hashtags": extract_text_list(item.get("hashtags")),
+            "mentions": extract_text_list(item.get("mentions")),
             "music": {
-                "title": item.get("musicMeta", {}).get("musicName"),
-                "author": item.get("musicMeta", {}).get("musicAuthor"),
-                "is_original": item.get("musicMeta", {}).get("musicOriginal"),
+                "title": raw_music.get("musicName"),
+                "author": raw_music.get("musicAuthor"),
+                "is_original": raw_music.get("musicOriginal"),
             },
-
-            "duration": item.get("videoMeta", {}).get("duration"),
-
+            "duration": raw_video.get("duration"),
             "flags": {
                 "is_slideshow": item.get("isSlideshow", False),
                 "is_pinned": item.get("isPinned", False),
                 "is_sponsored": item.get("isSponsored", False),
             },
-
             "platform": "tiktok",
-
-            # Always keep raw for future upgrades
             "raw": item
         })
 
@@ -85,9 +123,10 @@ def remove_duplicates(items):
     unique_items = []
 
     for item in items:
-        if item["id"] and item["id"] not in seen_ids:
+        item_id = item.get("id")
+        if item_id and item_id not in seen_ids:
             unique_items.append(item)
-            seen_ids.add(item["id"])
+            seen_ids.add(item_id)
 
     return unique_items
 
@@ -96,6 +135,8 @@ def main():
     all_items = load_all_json_files(ARCHIVE_DIR)
     normalized = normalize_items(all_items)
     unique_items = remove_duplicates(normalized)
+
+    os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(unique_items, f, ensure_ascii=False, indent=2)
