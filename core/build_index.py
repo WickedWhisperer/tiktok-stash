@@ -1,122 +1,93 @@
 import json
-import os
+from pathlib import Path
 
-INPUT_FILE = "archive/normalized_archive.json"
-OUTPUT_FILE = "archive/search_index.json"
+ARCHIVE_DIR = Path("archive")
+OUTPUT_FILE = ARCHIVE_DIR / "search_index.json"
 
 
-def extract_text_list(value):
-    if value is None:
-        return []
-
-    if isinstance(value, str):
-        return [value]
-
-    if isinstance(value, dict):
-        return [
-            str(
-                value.get("name")
-                or value.get("title")
-                or value.get("text")
-                or value.get("username")
-                or value.get("id")
-            )
-        ]
-
-    if isinstance(value, list):
-        out = []
-        for item in value:
-            if isinstance(item, dict):
-                val = (
-                    item.get("name")
-                    or item.get("title")
-                    or item.get("text")
-                    or item.get("username")
-                    or item.get("id")
-                )
-                if val:
-                    out.append(str(val))
-            elif item:
-                out.append(str(item))
-        return out
-
-    return []
+def safe_get(obj, *keys):
+    for k in keys:
+        if isinstance(obj, dict) and k in obj:
+            return obj[k]
+    return None
 
 
 def build_index():
-    if not os.path.exists(INPUT_FILE):
-        print("No normalized archive found.")
-        return
+    items = []
 
-    with open(INPUT_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    index = []
-
-    for item in data:
-        if not isinstance(item, dict):
+    for file in ARCHIVE_DIR.glob("*.json"):
+        if file.name == "search_index.json":
             continue
 
-        raw = item.get("raw", {}) or {}
+        with open(file, "r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except:
+                continue
 
-        hashtags = extract_text_list(item.get("hashtags") or raw.get("hashtags"))
-        mentions = extract_text_list(item.get("mentions") or raw.get("mentions"))
+        if not isinstance(data, list):
+            continue
 
-        stats = item.get("stats", {}) or {}
+        for item in data:
+            # 🔥 handle Apify structure properly
+            author = safe_get(item, "author", "authorMeta", "authorName")
+            if isinstance(author, dict):
+                author = author.get("name")
 
-        likes = stats.get("diggCount", 0)
-        views = stats.get("playCount", 0)
-        comments = stats.get("commentCount", 0)
-        shares = stats.get("shareCount", 0)
-        favorites = stats.get("collectCount", 0)
+            avatar = safe_get(item, "authorAvatar", "author_avatar")
+            caption = safe_get(item, "text", "caption", "desc")
 
-        music = item.get("music") or raw.get("musicMeta") or {}
+            created = safe_get(item, "createTimeISO", "created_at")
 
-        music_name = music.get("musicName") or music.get("title") or music.get("name")
-        music_author = music.get("musicAuthor") or music.get("author")
+            url = safe_get(item, "webVideoUrl", "url")
 
-        author_meta = raw.get("authorMeta", {}) or {}
+            stats = item.get("stats", {})
 
-        avatar = (
-            author_meta.get("avatar")
-            or author_meta.get("avatarUrl")
-            or author_meta.get("originalAvatarUrl")
-        )
+            likes = safe_get(item, "diggCount") or stats.get("diggCount")
+            views = safe_get(item, "playCount") or stats.get("playCount")
+            comments = safe_get(item, "commentCount") or stats.get("commentCount")
+            shares = safe_get(item, "shareCount") or stats.get("shareCount")
 
-        index.append({
-            "id": item.get("id"),
-            "author": item.get("author"),
-            "author_avatar": avatar,
-            "caption": item.get("caption"),
-            "created_at": item.get("created_at"),
-            "url": item.get("url"),
+            music = item.get("musicMeta", {}) or {}
 
-            "likes": likes,
-            "views": views,
-            "comments": comments,
-            "shares": shares,
-            "favorites": favorites,
+            hashtags = []
+            mentions = []
 
-            "hashtags": hashtags,
-            "mentions": mentions,
+            if caption:
+                for word in caption.split():
+                    if word.startswith("#"):
+                        hashtags.append(word[1:])
+                    if word.startswith("@"):
+                        mentions.append(word[1:])
 
-            "music_name": music_name,
-            "music_author": music_author,
-
-            "search_text": " ".join([
-                str(item.get("caption", "")),
+            search_text = " ".join(filter(None, [
+                caption,
                 " ".join(hashtags),
-                " ".join(mentions),
-                str(item.get("author", "")),
-                str(music_name or ""),
-                str(music_author or ""),
-            ]).lower()
-        })
+                author,
+                music.get("musicName"),
+                music.get("authorName")
+            ])).lower()
+
+            items.append({
+                "id": item.get("id"),
+                "author": author,
+                "author_avatar": avatar,
+                "caption": caption,
+                "created_at": created,
+                "url": url,
+                "likes": likes or 0,
+                "views": views or 0,
+                "comments": comments or 0,
+                "shares": shares or 0,
+                "hashtags": hashtags,
+                "mentions": mentions,
+                "music_name": music.get("musicName"),
+                "music_author": music.get("authorName"),
+                "search_text": search_text
+            })
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(index, f, ensure_ascii=False, indent=2)
-
-    print(f"Search index created: {OUTPUT_FILE} ({len(index)} items)")
+        json.dump(items, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
