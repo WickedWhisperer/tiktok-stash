@@ -6,25 +6,11 @@ OUTPUT_FILE = "archive/search/search_index.json"
 
 
 def normalize_list(value):
-    """Handles strings, dicts, lists from Apify safely"""
+    """Ensure value is always a list of strings."""
     if not value:
         return []
-
     if isinstance(value, str):
         return [value.strip()] if value.strip() else []
-
-    if isinstance(value, dict):
-        return [
-            str(
-                value.get("name")
-                or value.get("title")
-                or value.get("text")
-                or value.get("username")
-                or value.get("id")
-                or ""
-            )
-        ]
-
     if isinstance(value, list):
         out = []
         for v in value:
@@ -32,6 +18,7 @@ def normalize_list(value):
                 if v.strip():
                     out.append(v.strip())
             elif isinstance(v, dict):
+                # fallback: get some text if dict (legacy)
                 candidate = (
                     v.get("name")
                     or v.get("title")
@@ -42,7 +29,16 @@ def normalize_list(value):
                 if candidate:
                     out.append(str(candidate))
         return out
-
+    if isinstance(value, dict):
+        candidate = (
+            value.get("name")
+            or value.get("title")
+            or value.get("text")
+            or value.get("username")
+            or value.get("id")
+        )
+        if candidate:
+            return [str(candidate)]
     return []
 
 
@@ -70,13 +66,12 @@ def build_index():
             detailed_mentions = []
 
         author = item.get("author")
-
         author_profile = item.get("author_profile") or (
             f"https://www.tiktok.com/@{author}" if author else None
         )
 
-        # --- SEARCH TEXT (IMPORTANT) ---
-        search_text = " ".join([
+        # --- SEARCH TEXT ---
+        search_parts = [
             str(item.get("caption", "")),
             " ".join(hashtags),
             " ".join(mentions),
@@ -88,7 +83,8 @@ def build_index():
             str(author or ""),
             str(music.get("title") or ""),
             str(music.get("author") or ""),
-        ]).lower()
+        ]
+        search_text = " ".join(search_parts).lower()
 
         index.append({
             "id": item.get("id"),
