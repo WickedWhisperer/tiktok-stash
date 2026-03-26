@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Stash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --card: #161616;
+    --border: #222222;
+    --pink: #ff2d55;
+    --cyan: #00f2ea;
+    --text: #f0f0f0;
+    --muted: #666;
+    --dim: #333;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .logo span {
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    -webkit-text-fill-color: var(--muted);
+    display: block;
+    margin-top: -4px;
+    text-transform: uppercase;
+  }
+
+  .search-bar {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-bar input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px 10px 40px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar input:focus { border-color: var(--pink); }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  .search-bar svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .controls {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    padding-right: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+
+  select:focus { border-color: var(--cyan); }
+
+  .results-meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .results-meta strong {
+    color: var(--cyan);
+    font-size: 14px;
+  }
+
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeUp 0.3s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover {
+    border-color: #333;
+    transform: translateY(-2px);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--cyan));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    flex-shrink: 0;
+  }
+
+  .author-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .author-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .author-name a:hover { color: var(--cyan); }
+
+  .card-date {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .card-caption {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .card-caption .hashtag {
+    color: var(--cyan);
+    font-weight: 500;
+  }
+
+  .card-caption .mention {
+    color: var(--pink);
+    font-weight: 500;
+  }
+
+  .stats {
+    display: flex;
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .stat svg { flex-shrink: 0; }
+
+  .stat.likes { color: var(--pink); }
+  .stat.views { color: #aaa; }
+  .stat.comments { color: #aaa; }
+
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--dim);
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .card-link:hover {
+    color: var(--pink);
+    border-color: var(--pink);
+    background: rgba(255,45,85,0.06);
+  }
+
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+  }
+
+  .empty .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty h3 { font-size: 18px; font-weight: 500; margin-bottom: 6px; color: #555; }
+  .empty p { font-size: 13px; }
+
+  .loading {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 2px solid var(--border);
+    border-top-color: var(--pink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-banner {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .error-box {
+    background: rgba(255,45,85,0.08);
+    border: 1px solid rgba(255,45,85,0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #ff7096;
+    line-height: 1.6;
+  }
+
+  .error-box code {
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      STASH
+      <span>TikTok Archive</span>
+    </div>
+    <div class="search-bar">
+      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search captions, hashtags, authors…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <select id="authorFilter">
+    <option value="">All authors</option>
+  </select>
+  <select id="sortSelect">
+    <option value="likes">↓ Most liked</option>
+    <option value="views">↓ Most viewed</option>
+    <option value="comments">↓ Most commented</option>
+    <option value="date_desc">↓ Newest first</option>
+    <option value="date_asc">↑ Oldest first</option>
+  </select>
+  <select id="dateFilter">
+    <option value="">Any time</option>
+    <option value="7">Last 7 days</option>
+    <option value="30">Last 30 days</option>
+    <option value="90">Last 3 months</option>
+    <option value="365">Last year</option>
+  </select>
+  <div class="results-meta" id="resultsMeta"></div>
+</div>
+
+<div id="errorBanner" class="error-banner" style="display:none">
+  <div class="error-box" id="errorBox"></div>
+</div>
+
+<div class="grid" id="grid">
+  <div class="loading">
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:13px;">Loading archive…</div>
+  </div>
+</div>
+
+<script>
+let allItems = [];
+let filteredItems = [];
+
+function fmt(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function initials(name) {
+  if (!name) return '?';
+  return String(name).slice(0, 2).toUpperCase();
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return '';
+  }
+}
+
+function escHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escRe(s) {
+  return String(s ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function styleCaptions(text, query) {
+  if (!text) return '';
+  let s = escHtml(text);
+  s = s.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+  s = s.replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+  if (query) {
+    const re = new RegExp(`(${escRe(query)})`, 'gi');
+    s = s.replace(re, '<mark style="background:rgba(255,45,85,0.3);color:#fff;border-radius:2px;padding:0 1px">$1</mark>');
+  }
+  return s;
+}
+
+function getStat(item, key) {
+  const aliases = {
+    likes: ['likes', 'diggCount'],
+    views: ['views', 'playCount'],
+    comments: ['comments', 'commentCount']
+  };
+
+  for (const k of (aliases[key] || [key])) {
+    if (item[k] != null && !isNaN(item[k])) return Number(item[k]);
+  }
+  return 0;
+}
+
+function renderCard(item, query) {
+  const likes = getStat(item, 'likes');
+  const views = getStat(item, 'views');
+  const comments = getStat(item, 'comments');
+  const author = item.author || 'Unknown';
+  const caption = item.caption || '';
+  const url = item.url || '#';
+  const dateStr = formatDate(item.created_at);
+
+  return `
+    <div class="card">
+      <div class="card-author">
+        <div class="avatar">${escHtml(initials(author))}</div>
+        <div class="author-name">
+          <a href="https://tiktok.com/@${encodeURIComponent(author)}" target="_blank" rel="noopener">@${escHtml(author)}</a>
+        </div>
+        <div class="card-date">${dateStr}</div>
+      </div>
+      <div class="card-caption">${styleCaptions(caption, query)}</div>
+      <div class="stats">
+        <div class="stat likes">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          ${fmt(likes)}
+        </div>
+        <div class="stat views">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          ${fmt(views)}
+        </div>
+        <div class="stat comments">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          ${fmt(comments)}
+        </div>
+      </div>
+      ${url !== '#' ? `<a class="card-link" href="${escHtml(url)}" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Watch
+      </a>` : ''}
+    </div>`;
+}
+
+function render() {
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const author = document.getElementById('authorFilter').value;
+  const sort = document.getElementById('sortSelect').value;
+  const days = parseInt(document.getElementById('dateFilter').value) || 0;
+
+  let items = [...allItems];
+
+  if (query) {
+    items = items.filter(i => (i.search_text || '').includes(query));
+  }
+
+  if (author) {
+    items = items.filter(i => i.author === author);
+  }
+
+  if (days) {
+    const cutoff = Date.now() - days * 86400000;
+    items = items.filter(i => {
+      if (!i.created_at) return false;
+      return new Date(i.created_at).getTime() >= cutoff;
+    });
+  }
+
+  items.sort((a, b) => {
+    if (sort === 'date_desc') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    if (sort === 'date_asc') return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    return getStat(b, sort) - getStat(a, sort);
+  });
+
+  filteredItems = items;
+
+  const meta = document.getElementById('resultsMeta');
+  meta.innerHTML = `<strong>${items.length}</strong> video${items.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('grid');
+  if (items.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="icon">🔍</div><h3>No results found</h3><p>Try adjusting your search or filters</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((item, i) => {
+    const card = renderCard(item, query);
+    return card.replace('class="card"', `class="card" style="animation-delay:${Math.min(i * 30, 300)}ms"`);
+  }).join('');
+}
+
+function populateAuthors() {
+  const authors = [...new Set(allItems.map(i => i.author).filter(Boolean))].sort();
+  const sel = document.getElementById('authorFilter');
+  authors.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a;
+    opt.textContent = '@' + a;
+    sel.appendChild(opt);
+  });
+}
+
+async function loadData() {
+  try {
+    const res = await fetch('../archive/search_index.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status} — file not found`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('search_index.json is not an array');
+    allItems = data;
+    populateAuthors();
+    render();
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  const box = document.getElementById('errorBox');
+  banner.style.display = 'block';
+  box.innerHTML = `
+    <strong>⚠ Could not load archive</strong><br><br>
+    ${escHtml(msg)}<br><br>
+    Make sure <code>archive/search_index.json</code> exists in the repo root.<br><br>
+    If you open this locally, browsers block file fetches. Use GitHub Pages or a local server:<br>
+    <code>python -m http.server 8080</code>
+  `;
+  document.getElementById('grid').innerHTML = '';
+  document.getElementById('resultsMeta').textContent = '';
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('authorFilter').addEventListener('change', render);
+document.getElementById('sortSelect').addEventListener('change', render);
+document.getElementById('dateFilter').addEventListener('change', render);
+
+loadData();
+</script>
+</body>
+  </html>
