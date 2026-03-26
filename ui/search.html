@@ -29,6 +29,7 @@
     overflow-x: hidden;
   }
 
+  /* Noise overlay */
   body::before {
     content: '';
     position: fixed;
@@ -225,16 +226,6 @@
     flex-shrink: 0;
   }
 
-  .avatar-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-    background: #222;
-  }
-
   .author-name {
     font-size: 13px;
     font-weight: 600;
@@ -275,55 +266,10 @@
     font-weight: 500;
   }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 2px;
-  }
-
-  .chip {
-    font-size: 11px;
-    border: 1px solid var(--dim);
-    border-radius: 999px;
-    padding: 4px 8px;
-    color: var(--muted);
-    background: rgba(255,255,255,0.03);
-    text-decoration: none;
-  }
-
-  .chip.hashtag {
-    color: var(--cyan);
-  }
-
-  .chip.mention {
-    color: var(--pink);
-  }
-
-  .music-row {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .music-row a {
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .music-row a:hover {
-    color: var(--cyan);
-  }
-
-  .music-row strong {
-    color: var(--text);
-  }
-
   .stats {
     display: flex;
     gap: 14px;
     margin-top: 4px;
-    flex-wrap: wrap;
   }
 
   .stat {
@@ -340,7 +286,6 @@
   .stat.likes { color: var(--pink); }
   .stat.views { color: #aaa; }
   .stat.comments { color: #aaa; }
-  .stat.shares { color: #aaa; }
 
   .card-link {
     display: inline-flex;
@@ -446,7 +391,6 @@
     <option value="likes">↓ Most liked</option>
     <option value="views">↓ Most viewed</option>
     <option value="comments">↓ Most commented</option>
-    <option value="shares">↓ Most shared</option>
     <option value="date_desc">↓ Newest first</option>
     <option value="date_asc">↑ Oldest first</option>
   </select>
@@ -475,44 +419,46 @@
 let allItems = [];
 let filteredItems = [];
 
+// ── helpers ─────────────────────────────────────────────────────────────────
+
 function fmt(n) {
   if (n == null || isNaN(n)) return '—';
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
   return String(n);
 }
 
 function initials(name) {
   if (!name) return '?';
-  return String(name).slice(0, 2).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
 }
 
 function formatDate(iso) {
   if (!iso) return '';
   try {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return '';
-  }
+    return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  } catch { return ''; }
 }
 
-function escHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function highlightText(text, query) {
+  if (!query || !text) return escHtml(text || '');
+  const escaped = escHtml(text);
+  const re = new RegExp(`(${escRe(query)})`, 'gi');
+  return escaped.replace(re, '<mark style="background:rgba(255,45,85,0.3);color:#fff;border-radius:2px;padding:0 1px">$1</mark>');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function escRe(s) {
-  return String(s ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function styleCaptions(text, query) {
   if (!text) return '';
-  let s = escHtml(text);
-  s = s.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+  // hashtags & mentions
+  let s = text.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
   s = s.replace(/@(\w+)/g, '<span class="mention">@$1</span>');
   if (query) {
     const re = new RegExp(`(${escRe(query)})`, 'gi');
@@ -521,107 +467,41 @@ function styleCaptions(text, query) {
   return s;
 }
 
+// Stat field normalisation — search_index.json uses likes/views/comments
+// but may also carry diggCount/playCount/commentCount from older builds
 function getStat(item, key) {
   const aliases = {
-    likes: ['likes', 'diggCount'],
-    views: ['views', 'playCount'],
-    comments: ['comments', 'commentCount'],
-    shares: ['shares', 'shareCount']
+    likes:    ['likes','diggCount'],
+    views:    ['views','playCount'],
+    comments: ['comments','commentCount']
   };
-
   for (const k of (aliases[key] || [key])) {
     if (item[k] != null && !isNaN(item[k])) return Number(item[k]);
   }
   return 0;
 }
 
-function toTextList(value) {
-  if (Array.isArray(value)) {
-    return value
-      .map(v => {
-        if (typeof v === 'string') return v;
-        if (v && typeof v === 'object') {
-          return v.name || v.title || v.text || v.username || v.id || '';
-        }
-        return '';
-      })
-      .filter(Boolean);
-  }
-
-  if (typeof value === 'string') return [value];
-  return [];
-}
+// ── render ───────────────────────────────────────────────────────────────────
 
 function renderCard(item, query) {
-  const likes = getStat(item, 'likes');
-  const views = getStat(item, 'views');
+  const likes    = getStat(item, 'likes');
+  const views    = getStat(item, 'views');
   const comments = getStat(item, 'comments');
-  const shares = getStat(item, 'shares');
-
-  const author = item.author || 'Unknown';
-  const caption = item.caption || '';
-  const url = item.url || '#';
-  const dateStr = formatDate(item.created_at);
-
-  const avatarHtml = item.author_avatar
-    ? `<img class="avatar-img" src="${escHtml(item.author_avatar)}" alt="${escHtml(author)}" loading="lazy">`
-    : `<div class="avatar">${escHtml(initials(author))}</div>`;
-
-  const hashtags = toTextList(item.hashtags);
-  const mentions = toTextList(item.mentions);
-
-  const musicName = item.music_name || '';
-  const musicAuthor = item.music_author || '';
-  const musicUrl = item.music_url || item.music_play_url || '';
-  const musicId = item.music_id || '';
-
-  let resolvedMusicLink = musicUrl;
-  if (!resolvedMusicLink && musicId) {
-    resolvedMusicLink = `https://www.tiktok.com/music/${encodeURIComponent(musicId)}`;
-  }
-
-  const musicLine = (musicName || musicAuthor)
-    ? `<div class="music-row">🎵 ${
-        resolvedMusicLink
-          ? `<a href="${escHtml(resolvedMusicLink)}" target="_blank" rel="noopener">${escHtml(musicName || 'Sound')}</a>`
-          : escHtml(musicName || 'Sound')
-      }${musicName && musicAuthor ? ' · ' : ''}${escHtml(musicAuthor)}</div>`
-    : '';
-
-  const authorProfile = item.author_profile || (author && author !== 'Unknown' ? `https://tiktok.com/@${encodeURIComponent(author)}` : '');
-
-  const tagLine = (hashtags.length || mentions.length)
-    ? `<div class="chips">
-        ${hashtags.map(tag => `<span class="chip hashtag">#${escHtml(tag.replace(/^#/, ''))}</span>`).join('')}
-        ${mentions.map(user => `
-          <a class="chip mention"
-             href="https://tiktok.com/@${encodeURIComponent(user.replace(/^@/, ''))}"
-             target="_blank"
-             rel="noopener">
-            @${escHtml(user.replace(/^@/, ''))}
-          </a>
-        `).join('')}
-      </div>`
-    : '';
+  const author   = item.author || 'Unknown';
+  const caption  = item.caption || '';
+  const url      = item.url || '#';
+  const dateStr  = formatDate(item.created_at);
 
   return `
     <div class="card">
       <div class="card-author">
-        ${avatarHtml}
+        <div class="avatar">${escHtml(initials(author))}</div>
         <div class="author-name">
-          ${authorProfile
-            ? `<a href="${escHtml(authorProfile)}" target="_blank" rel="noopener">@${escHtml(author)}</a>`
-            : `@${escHtml(author)}`
-          }
+          <a href="https://tiktok.com/@${encodeURIComponent(author)}" target="_blank" rel="noopener">@${escHtml(author)}</a>
         </div>
         <div class="card-date">${dateStr}</div>
       </div>
-
       <div class="card-caption">${styleCaptions(caption, query)}</div>
-
-      ${musicLine}
-      ${tagLine}
-
       <div class="stats">
         <div class="stat likes">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -635,12 +515,7 @@ function renderCard(item, query) {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           ${fmt(comments)}
         </div>
-        <div class="stat shares">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16"/><path d="M13 5l7 7-7 7"/></svg>
-          ${fmt(shares)}
-        </div>
       </div>
-
       ${url !== '#' ? `<a class="card-link" href="${escHtml(url)}" target="_blank" rel="noopener">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Watch
@@ -649,21 +524,24 @@ function renderCard(item, query) {
 }
 
 function render() {
-  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const query  = document.getElementById('searchInput').value.trim().toLowerCase();
   const author = document.getElementById('authorFilter').value;
-  const sort = document.getElementById('sortSelect').value;
-  const days = parseInt(document.getElementById('dateFilter').value) || 0;
+  const sort   = document.getElementById('sortSelect').value;
+  const days   = parseInt(document.getElementById('dateFilter').value) || 0;
 
   let items = [...allItems];
 
+  // keyword filter
   if (query) {
     items = items.filter(i => (i.search_text || '').includes(query));
   }
 
+  // author filter
   if (author) {
     items = items.filter(i => i.author === author);
   }
 
+  // date filter
   if (days) {
     const cutoff = Date.now() - days * 86400000;
     items = items.filter(i => {
@@ -672,9 +550,10 @@ function render() {
     });
   }
 
+  // sort
   items.sort((a, b) => {
-    if (sort === 'date_desc') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-    if (sort === 'date_asc') return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    if (sort === 'date_desc') return new Date(b.created_at||0) - new Date(a.created_at||0);
+    if (sort === 'date_asc')  return new Date(a.created_at||0) - new Date(b.created_at||0);
     return getStat(b, sort) - getStat(a, sort);
   });
 
@@ -691,9 +570,12 @@ function render() {
 
   grid.innerHTML = items.map((item, i) => {
     const card = renderCard(item, query);
+    // stagger animation
     return card.replace('class="card"', `class="card" style="animation-delay:${Math.min(i * 30, 300)}ms"`);
   }).join('');
 }
+
+// ── populate author dropdown ──────────────────────────────────────────────────
 
 function populateAuthors() {
   const authors = [...new Set(allItems.map(i => i.author).filter(Boolean))].sort();
@@ -706,9 +588,11 @@ function populateAuthors() {
   });
 }
 
+// ── load data ────────────────────────────────────────────────────────────────
+
 async function loadData() {
   try {
-    const res = await fetch('../archive/search_index.json');
+    const res = await fetch('../archive/search/search_index.json');
     if (!res.ok) throw new Error(`HTTP ${res.status} — file not found`);
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('search_index.json is not an array');
@@ -722,18 +606,21 @@ async function loadData() {
 
 function showError(msg) {
   const banner = document.getElementById('errorBanner');
-  const box = document.getElementById('errorBox');
+  const box    = document.getElementById('errorBox');
   banner.style.display = 'block';
   box.innerHTML = `
     <strong>⚠ Could not load archive</strong><br><br>
     ${escHtml(msg)}<br><br>
-    Make sure <code>archive/search_index.json</code> exists in the repo root.<br><br>
-    If you open this locally, browsers block file fetches. Use GitHub Pages or a local server:<br>
-    <code>python -m http.server 8080</code>
+    Make sure <code>archive/search_index.json</code> exists in the same directory as this file.<br>
+    <br>
+    <strong>Local usage:</strong> browsers block local file fetches. Run a simple server:<br>
+    <code>python -m http.server 8080</code> then open <code>http://localhost:8080</code>
   `;
   document.getElementById('grid').innerHTML = '';
   document.getElementById('resultsMeta').textContent = '';
 }
+
+// ── events ────────────────────────────────────────────────────────────────────
 
 document.getElementById('searchInput').addEventListener('input', render);
 document.getElementById('authorFilter').addEventListener('change', render);
