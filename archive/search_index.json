@@ -2,7 +2,7 @@
   {
     "id": "7620870073321868566",
     "author": "flamrzz",
-    "author_avatar": "https://p16-common-sign.tiktokcdn-us.com/tos-maliva-avt-0068/9fd1a1f382f0e2178a90e3fae26c2ff7~tplv-tiktokx-cropcenter:720:720.jpeg?dr=9640&refresh_token=85222bd3&x-expires=1774681200&x-signature=btZXY3xCUCme6nEpu6FddrpcWrQ%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=useast8",
+    "author_avatar": null,
     "caption": "Oh Love | #lovequinn #lovequinnedit #you #edit #fyp ",
     "created_at": "2026-03-24T17:08:11.000Z",
     "url": "https://www.tiktok.com/@flamrzz/video/7620870073321868566",
@@ -10,7 +10,6 @@
     "views": 0,
     "comments": 0,
     "shares": 0,
-    "favorites": 0,
     "hashtags": [
       "lovequinn",
       "lovequinnedit",
@@ -19,9 +18,32 @@
       "fyp"
     ],
     "mentions": [],
-    "music_name": "originalljud",
-    "music_author": "flamrzz",
-    "search_text": "oh love | #lovequinn #lovequinnedit #you #edit #fyp  lovequinn lovequinnedit you edit fyp  flamrzz originalljud flamrzz"
+    "music_name": null,
+    "music_author": null,
+    "search_text": "oh love | #lovequinn #lovequinnedit #you #edit #fyp  lovequinn lovequinnedit you edit fyp flamrzz"
+  },
+  {
+    "id": "7619389482399255830",
+    "author": "flamrzz",
+    "author_avatar": null,
+    "caption": "We all know who the sicko is | #joegoldberg #joegoldbergedit #you #edit #fyp ",
+    "created_at": "2026-03-20T17:22:41.000Z",
+    "url": "https://www.tiktok.com/@flamrzz/video/7619389482399255830",
+    "likes": 0,
+    "views": 0,
+    "comments": 0,
+    "shares": 0,
+    "hashtags": [
+      "joegoldberg",
+      "joegoldbergedit",
+      "you",
+      "edit",
+      "fyp"
+    ],
+    "mentions": [],
+    "music_name": null,
+    "music_author": null,
+    "search_text": "we all know who the sicko is | #joegoldberg #joegoldbergedit #you #edit #fyp  joegoldberg joegoldbergedit you edit fyp flamrzz"
   },
   {
     "id": "7620164000902417666",
@@ -34,18 +56,11 @@
     "views": 0,
     "comments": 0,
     "shares": 0,
-    "favorites": 0,
-    "hashtags": [
-      "joegoldberg",
-      "joegoldbergedit",
-      "you",
-      "edit",
-      "fyp"
-    ],
+    "hashtags": [],
     "mentions": [],
     "music_name": null,
     "music_author": null,
-    "search_text": "none joegoldberg joegoldbergedit you edit fyp  none  "
+    "search_text": ""
   },
   {
     "id": "7619757123131559190",
@@ -58,42 +73,11 @@
     "views": 0,
     "comments": 0,
     "shares": 0,
-    "favorites": 0,
-    "hashtags": [
-      "joegoldberg",
-      "joegoldbergedit",
-      "you",
-      "edit",
-      "fyp"
-    ],
+    "hashtags": [],
     "mentions": [],
     "music_name": null,
     "music_author": null,
-    "search_text": "none joegoldberg joegoldbergedit you edit fyp  none  "
-  },
-  {
-    "id": "7619389482399255830",
-    "author": null,
-    "author_avatar": null,
-    "caption": null,
-    "created_at": null,
-    "url": null,
-    "likes": 0,
-    "views": 0,
-    "comments": 0,
-    "shares": 0,
-    "favorites": 0,
-    "hashtags": [
-      "joegoldberg",
-      "joegoldbergedit",
-      "you",
-      "edit",
-      "fyp"
-    ],
-    "mentions": [],
-    "music_name": null,
-    "music_author": null,
-    "search_text": "none joegoldberg joegoldbergedit you edit fyp  none  "
+    "search_text": ""
   },
   {
     "id": "7618315955151605014",
@@ -106,17 +90,10 @@
     "views": 0,
     "comments": 0,
     "shares": 0,
-    "favorites": 0,
-    "hashtags": [
-      "joegoldberg",
-      "joegoldbergedit",
-      "you",
-      "edit",
-      "fyp"
-    ],
+    "hashtags": [],
     "mentions": [],
     "music_name": null,
     "music_author": null,
-    "search_text": "none joegoldberg joegoldbergedit you edit fyp  none  "
+    "search_text": ""
   }
 ]
