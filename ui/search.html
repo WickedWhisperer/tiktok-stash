@@ -289,6 +289,7 @@
     padding: 4px 8px;
     color: var(--muted);
     background: rgba(255,255,255,0.03);
+    text-decoration: none;
   }
 
   .chip.hashtag {
@@ -305,6 +306,15 @@
     margin-top: 2px;
   }
 
+  .music-row a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .music-row a:hover {
+    color: var(--cyan);
+  }
+
   .music-row strong {
     color: var(--text);
   }
@@ -313,6 +323,7 @@
     display: flex;
     gap: 14px;
     margin-top: 4px;
+    flex-wrap: wrap;
   }
 
   .stat {
@@ -561,14 +572,35 @@ function renderCard(item, query) {
 
   const musicName = item.music_name || '';
   const musicAuthor = item.music_author || '';
+  const musicUrl = item.music_url || item.music_play_url || '';
+  const musicId = item.music_id || '';
+
+  let resolvedMusicLink = musicUrl;
+  if (!resolvedMusicLink && musicId) {
+    resolvedMusicLink = `https://www.tiktok.com/music/${encodeURIComponent(musicId)}`;
+  }
+
   const musicLine = (musicName || musicAuthor)
-    ? `<div class="music-row">🎵 ${escHtml(musicName)}${musicName && musicAuthor ? ' · ' : ''}${escHtml(musicAuthor)}</div>`
+    ? `<div class="music-row">🎵 ${
+        resolvedMusicLink
+          ? `<a href="${escHtml(resolvedMusicLink)}" target="_blank" rel="noopener">${escHtml(musicName || 'Sound')}</a>`
+          : escHtml(musicName || 'Sound')
+      }${musicName && musicAuthor ? ' · ' : ''}${escHtml(musicAuthor)}</div>`
     : '';
+
+  const authorProfile = item.author_profile || (author && author !== 'Unknown' ? `https://tiktok.com/@${encodeURIComponent(author)}` : '');
 
   const tagLine = (hashtags.length || mentions.length)
     ? `<div class="chips">
         ${hashtags.map(tag => `<span class="chip hashtag">#${escHtml(tag.replace(/^#/, ''))}</span>`).join('')}
-        ${mentions.map(tag => `<span class="chip mention">@${escHtml(tag.replace(/^@/, ''))}</span>`).join('')}
+        ${mentions.map(user => `
+          <a class="chip mention"
+             href="https://tiktok.com/@${encodeURIComponent(user.replace(/^@/, ''))}"
+             target="_blank"
+             rel="noopener">
+            @${escHtml(user.replace(/^@/, ''))}
+          </a>
+        `).join('')}
       </div>`
     : '';
 
@@ -577,7 +609,10 @@ function renderCard(item, query) {
       <div class="card-author">
         ${avatarHtml}
         <div class="author-name">
-          <a href="https://tiktok.com/@${encodeURIComponent(author)}" target="_blank" rel="noopener">@${escHtml(author)}</a>
+          ${authorProfile
+            ? `<a href="${escHtml(authorProfile)}" target="_blank" rel="noopener">@${escHtml(author)}</a>`
+            : `@${escHtml(author)}`
+          }
         </div>
         <div class="card-date">${dateStr}</div>
       </div>
