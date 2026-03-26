@@ -1,6 +1,6 @@
 import json
 from collectors.apify_collector import run_apify_actor
-from core.save_item import save_item
+from core.save_item import save_items  # IMPORTANT: plural
 
 def main():
     with open("config/settings.json") as f:
@@ -11,9 +11,8 @@ def main():
     else:
         raise Exception("Unsupported collector")
 
-    # Save RAW items only
-    for item in items:
-        save_item(item)
+    # Save ALL items in one file (per run)
+    save_items(items)
 
 if __name__ == "__main__":
     main()
