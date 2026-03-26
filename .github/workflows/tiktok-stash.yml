@@ -17,52 +17,30 @@ jobs:
       APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        run: |
+      - run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install requests
 
-      - name: Debug token presence
+      - run: python main.py
+
+      - run: python core/normalize.py
+
+      - run: python core/build_index.py
+
+      - name: Remove raw data (privacy)
         run: |
-          if [ -z "$APIFY_TOKEN" ]; then
-            echo "APIFY_TOKEN is NOT set"
-            exit 1
-          else
-            echo "APIFY_TOKEN is set"
-          fi
+          find archive -type f ! -name "search_index.json" -delete
 
-      - name: Run TikTok collector
-        run: python main.py
-
-      - name: Normalize archive
-        run: python core/normalize.py
-
-      - name: Build search index
-        run: python core/build_index.py
-
-      - name: Commit updated archive and UI
+      - name: Commit
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add archive/ ui/search.html index.html
-          if ! git diff --cached --quiet; then
-            git commit -m "Update archive [skip ci]"
-            git push
-          fi
-
-      - name: Upload archive output
-        uses: actions/upload-artifact@v4
-        with:
-          name: tiktok-archive
-          path: archive/
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git diff --cached --quiet || git commit -m "update archive [skip ci]"
+          git push
