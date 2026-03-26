@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write   # THIS FIXES THE 403 ERROR
+
 jobs:
   archive:
     runs-on: ubuntu-latest
@@ -36,11 +39,10 @@ jobs:
       - name: Build search index
         run: python core/build_index.py
 
-      # THIS IS THE IMPORTANT PART
-      - name: Commit updated archive to repo
+      - name: Commit and push archive
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add archive/
-          git commit -m "Update archive data" || echo "No changes"
-          git push
+          git commit -m "Update archive data" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
