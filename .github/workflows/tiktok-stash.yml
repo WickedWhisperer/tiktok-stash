@@ -28,6 +28,7 @@ jobs:
           mkdir -p archive/derived
           mkdir -p archive/search
           mkdir -p archive/media
+          mkdir -p archive/system
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,9 +40,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install yt-dlp
-
-      - name: Verify yt-dlp
-        run: yt-dlp --version
 
       - name: Setup rclone
         uses: AnimMouse/setup-rclone@v1
@@ -55,13 +53,13 @@ jobs:
         run: python main.py
 
       - name: Normalize
-        run: python core/normalize.py
+        run: python -m core.normalize
 
       - name: Download + Upload + Enrich
-        run: python core/download_step.py
+        run: python -m core.download_step
 
       - name: Build index
-        run: python core/build_index.py
+        run: python -m core.build_index
 
       - name: Commit and push
         run: |
