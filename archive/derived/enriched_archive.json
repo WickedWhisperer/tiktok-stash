@@ -161,13 +161,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
-    "video_storage_path": null,
-    "video_storage_url": "",
-    "uploaded_at": null,
-    "is_available": true,
-    "upload_status": "completed",
-    "local_path": "archive/videos/flamrzz/7620870073321868566.mp4"
+    "download_status": "download_failed"
   },
   {
     "id": "7620164000902417666",
@@ -332,13 +326,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
-    "video_storage_path": null,
-    "video_storage_url": "",
-    "uploaded_at": null,
-    "is_available": true,
-    "upload_status": "completed",
-    "local_path": "archive/videos/flamrzz/7620164000902417666.mp4"
+    "download_status": "download_failed"
   },
   {
     "id": "7619757123131559190",
@@ -503,13 +491,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
-    "video_storage_path": null,
-    "video_storage_url": "",
-    "uploaded_at": null,
-    "is_available": true,
-    "upload_status": "completed",
-    "local_path": "archive/videos/flamrzz/7619757123131559190.mp4"
+    "download_status": "download_failed"
   },
   {
     "id": "7619389482399255830",
@@ -655,13 +637,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
-    "video_storage_path": null,
-    "video_storage_url": "",
-    "uploaded_at": null,
-    "is_available": true,
-    "upload_status": "completed",
-    "local_path": "archive/videos/flamrzz/7619389482399255830.mp4"
+    "download_status": "download_failed"
   },
   {
     "id": "7618315955151605014",
@@ -807,12 +783,6 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
-    "video_storage_path": null,
-    "video_storage_url": "",
-    "uploaded_at": null,
-    "is_available": true,
-    "upload_status": "completed",
-    "local_path": "archive/videos/flamrzz/7618315955151605014.mp4"
+    "download_status": "download_failed"
   }
 ]
