@@ -161,7 +161,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/media/7620870073321868566.mp4"
+    "local_video": "archive/videos/7620870073321868566.mp4"
   },
   {
     "id": "7620164000902417666",
@@ -326,7 +326,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/media/7620164000902417666.mp4"
+    "local_video": "archive/videos/7620164000902417666.mp4"
   },
   {
     "id": "7619757123131559190",
@@ -491,7 +491,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/media/7619757123131559190.mp4"
+    "local_video": "archive/videos/7619757123131559190.mp4"
   },
   {
     "id": "7619389482399255830",
@@ -637,7 +637,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/media/7619389482399255830.mp4"
+    "local_video": "archive/videos/7619389482399255830.mp4"
   },
   {
     "id": "7618315955151605014",
@@ -783,6 +783,6 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/media/7618315955151605014.mp4"
+    "local_video": "archive/videos/7618315955151605014.mp4"
   }
 ]
