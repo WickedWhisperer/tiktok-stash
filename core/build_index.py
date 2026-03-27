@@ -86,6 +86,7 @@ def build_index():
         search_text = " ".join(search_parts).lower()
 
         index.append({
+            # --- CORE ---
             "id": item.get("id"),
             "author": author,
             "author_profile": author_profile,
@@ -94,34 +95,40 @@ def build_index():
             "created_at": item.get("created_at"),
             "url": item.get("url"),
 
-            # 🔴 NEW: storage + download status
+            # --- STORAGE SYSTEM (IMPORTANT) ---
             "video_storage_url": item.get("video_storage_url"),
-            "download_status": item.get("download_status"),
+            "video_storage_path": item.get("video_storage_path"),  # NEW (structured path)
+            "download_status": item.get("download_status", "unknown"),
+            "download_error": item.get("download_error"),          # NEW (debugging)
+            "uploaded_at": item.get("uploaded_at"),                # NEW (sync tracking)
 
-            # stats
+            # --- STATS ---
             "likes": stats.get("likes", 0),
             "views": stats.get("views", 0),
             "comments": stats.get("comments", 0),
             "shares": stats.get("shares", 0),
 
-            # tags
+            # --- TAGS ---
             "hashtags": hashtags,
             "mentions": mentions,
             "detailed_mentions": detailed_mentions,
 
-            # music
+            # --- MUSIC ---
             "music_name": music.get("title"),
             "music_author": music.get("author"),
             "music_url": music.get("play_url"),
             "music_cover": music.get("cover_medium_url"),
 
-            # video
+            # --- VIDEO META ---
             "video_cover_url": video.get("cover_url"),
             "video_duration": video.get("duration"),
+            "video_width": video.get("width"),     # NEW
+            "video_height": video.get("height"),   # NEW
 
-            # extra
+            # --- EXTRA ---
             "media_urls": item.get("media_urls", []),
 
+            # --- SEARCH ---
             "search_text": search_text
         })
 
