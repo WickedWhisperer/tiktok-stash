@@ -22,12 +22,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Create proper folder structure (no deletion anymore)
       - name: Ensure archive structure exists
         run: |
           mkdir -p archive/raw
           mkdir -p archive/derived
           mkdir -p archive/search
+          mkdir -p archive/media
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,13 +37,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install -r requirements.txt
 
-      - name: Run TikTok collector (saves raw automatically)
+      - name: Run TikTok collector
         run: python main.py
 
       - name: Normalize archive
         run: python core/normalize.py
+
+      - name: Download videos
+        run: python core/download_step.py
 
       - name: Build search index
         run: python core/build_index.py
@@ -53,5 +56,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add archive/
-          git commit -m "Update archive data (new run)" || echo "No changes to commit"
+          git commit -m "Update archive data (with videos)" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
