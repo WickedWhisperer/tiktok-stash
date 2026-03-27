@@ -9,8 +9,11 @@ def load_queue():
     if not os.path.exists(RETRY_FILE):
         return []
 
-    with open(RETRY_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(RETRY_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return []
 
     if isinstance(data, list):
         return data
