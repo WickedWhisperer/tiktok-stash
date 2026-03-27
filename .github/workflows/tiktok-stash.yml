@@ -29,7 +29,8 @@ jobs:
           mkdir -p archive/derived
           mkdir -p archive/search
           mkdir -p archive/videos
-
+          mkdir -p archive/meta
+          
       # Fix Python imports
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$PWD/core" >> $GITHUB_ENV
