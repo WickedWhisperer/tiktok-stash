@@ -1,24 +1,27 @@
 {
   "collector": "apify",
-
   "input": {
     "profiles": ["flamrzz"],
     "profileScrapeSections": ["videos"],
     "profileSorting": "latest",
     "resultsPerPage": 5,
     "maxProfilesPerQuery": 1,
-    "shouldDownloadVideos": false
+    "shouldDownloadVideos": false,
+    "shouldDownloadSubtitles": false,
+    "shouldDownloadCovers": false
   },
-
   "storage": {
     "provider": "mega",
-    "structured_paths": true,
-    "delete_local_after_upload": true,
+    "remote_name": "mega",
+    "remote_root": "tiktok-archive",
     "generate_public_links": false
   },
-
+  "sync": {
+    "parallel_workers": 2,
+    "upload_retries": 3,
+    "upload_retry_delay": 5
+  },
   "download": {
-    "retries": 3,
-    "timeout": 60
+    "retries": 3
   }
 }
