@@ -161,7 +161,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "download_failed"
+    "video_storage_url": "tiktok-archive/flamrzz/7620870073321868566/video.mp4",
+    "download_status": "uploaded"
   },
   {
     "id": "7620164000902417666",
@@ -326,7 +327,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "download_failed"
+    "video_storage_url": "tiktok-archive/flamrzz/7620164000902417666/video.mp4",
+    "download_status": "uploaded"
   },
   {
     "id": "7619757123131559190",
@@ -491,7 +493,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "download_failed"
+    "video_storage_url": "tiktok-archive/flamrzz/7619757123131559190/video.mp4",
+    "download_status": "uploaded"
   },
   {
     "id": "7619389482399255830",
@@ -637,7 +640,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "download_failed"
+    "video_storage_url": "tiktok-archive/flamrzz/7619389482399255830/video.mp4",
+    "download_status": "uploaded"
   },
   {
     "id": "7618315955151605014",
@@ -783,6 +787,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "download_failed"
+    "video_storage_url": "tiktok-archive/flamrzz/7618315955151605014/video.mp4",
+    "download_status": "uploaded"
   }
 ]
