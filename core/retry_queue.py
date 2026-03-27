@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 RETRY_FILE = "archive/system/retry_queue.json"
 
@@ -7,8 +8,14 @@ RETRY_FILE = "archive/system/retry_queue.json"
 def load_queue():
     if not os.path.exists(RETRY_FILE):
         return []
+
     with open(RETRY_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+
+    if isinstance(data, list):
+        return data
+
+    return []
 
 
 def save_queue(queue):
@@ -17,19 +24,31 @@ def save_queue(queue):
         json.dump(queue, f, ensure_ascii=False, indent=2)
 
 
-def add_to_queue(video_id, reason):
+def add_to_queue(video_id, reason, error=None):
     queue = load_queue()
+    now = datetime.utcnow().isoformat()
 
-    if not any(q["id"] == video_id for q in queue):
-        queue.append({
-            "id": video_id,
-            "reason": reason
-        })
+    for entry in queue:
+        if entry.get("video_id") == video_id:
+            entry["reason"] = reason
+            entry["last_error"] = error
+            entry["attempts"] = int(entry.get("attempts", 0)) + 1
+            entry["last_attempt"] = now
+            save_queue(queue)
+            return
+
+    queue.append({
+        "video_id": video_id,
+        "reason": reason,
+        "last_error": error,
+        "attempts": 1,
+        "last_attempt": now
+    })
 
     save_queue(queue)
 
 
 def remove_from_queue(video_id):
     queue = load_queue()
-    queue = [q for q in queue if q["id"] != video_id]
+    queue = [entry for entry in queue if entry.get("video_id") != video_id]
     save_queue(queue)
