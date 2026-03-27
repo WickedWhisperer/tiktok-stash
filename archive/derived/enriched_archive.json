@@ -161,7 +161,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/videos/7620870073321868566.mp4"
+    "video_url": "mega:flamrzz/7620870073321868566.mp4",
+    "storage": "mega"
   },
   {
     "id": "7620164000902417666",
@@ -326,7 +327,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/videos/7620164000902417666.mp4"
+    "video_url": "mega:flamrzz/7620164000902417666.mp4",
+    "storage": "mega"
   },
   {
     "id": "7619757123131559190",
@@ -491,7 +493,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/videos/7619757123131559190.mp4"
+    "video_url": "mega:flamrzz/7619757123131559190.mp4",
+    "storage": "mega"
   },
   {
     "id": "7619389482399255830",
@@ -637,7 +640,8 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/videos/7619389482399255830.mp4"
+    "video_url": "mega:flamrzz/7619389482399255830.mp4",
+    "storage": "mega"
   },
   {
     "id": "7618315955151605014",
@@ -783,6 +787,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "local_video": "archive/videos/7618315955151605014.mp4"
+    "video_url": "mega:flamrzz/7618315955151605014.mp4",
+    "storage": "mega"
   }
 ]
