@@ -1,25 +1,29 @@
 import subprocess
-import os
 
 
-def upload_to_mega(local_path, remote_path):
-    """
-    Upload file using rclone to MEGA
-    Returns public link (if configured)
-    """
+def build_remote_path(provider, author, video_id):
+    return f"{provider}:tiktok-archive/{author}/{video_id}.mp4"
 
-    cmd = [
-        "rclone",
-        "copy",
-        local_path,
-        f"mega:{remote_path}",
-        "--progress"
-    ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+def upload_file(local_path, remote_path):
+    try:
+        subprocess.run(
+            ["rclone", "copy", local_path, remote_path],
+            check=True
+        )
+        return True
+    except Exception as e:
+        print(f"[UPLOAD ERROR] {e}")
+        return False
 
-    if result.returncode != 0:
-        raise Exception(f"Upload failed: {result.stderr}")
 
-    # Return pseudo path (we'll improve later with share links)
-    return f"mega:{remote_path}"
+def generate_public_link(remote_path):
+    try:
+        result = subprocess.run(
+            ["rclone", "link", remote_path],
+            capture_output=True,
+            text=True
+        )
+        return result.stdout.strip()
+    except:
+        return None
