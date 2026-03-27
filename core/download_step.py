@@ -1,11 +1,9 @@
+import hashlib
 import json
 import os
-import sys
-from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from copy import deepcopy
 from datetime import datetime
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.downloader import download_video
 from core.retry_queue import add_to_queue, load_queue, remove_from_queue
@@ -18,46 +16,51 @@ MIN_VALID_BYTES = 10 * 1024
 
 
 def load_settings():
+    default = {
+        "storage": {
+            "provider": "mega",
+            "remote_name": "mega",
+            "remote_root": "tiktok-archive",
+            "generate_public_links": False,
+        },
+        "sync": {
+            "parallel_workers": 3,
+            "upload_retries": 3,
+            "upload_retry_delay": 5,
+        },
+        "download": {
+            "retries": 3,
+        },
+    }
+
     path = "config/settings.json"
     if not os.path.exists(path):
-        return {
-            "storage": {
-                "provider": "mega",
-                "remote_name": "mega",
-                "remote_root": "tiktok-archive",
-                "generate_public_links": False
-            },
-            "sync": {
-                "parallel_workers": 2,
-                "upload_retries": 3,
-                "upload_retry_delay": 5
-            },
-            "download": {
-                "retries": 3
-            }
-        }
+        return default
 
-    with open(path, "r", encoding="utf-8") as f:
-        settings = json.load(f)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+    except Exception:
+        return default
 
-    storage_cfg = settings.get("storage", {})
-    sync_cfg = settings.get("sync", {})
-    download_cfg = settings.get("download", {})
+    storage_cfg = loaded.get("storage", {}) if isinstance(loaded, dict) else {}
+    sync_cfg = loaded.get("sync", {}) if isinstance(loaded, dict) else {}
+    download_cfg = loaded.get("download", {}) if isinstance(loaded, dict) else {}
 
     return {
         "storage": {
-            "provider": storage_cfg.get("provider", "mega"),
-            "remote_name": storage_cfg.get("remote_name") or storage_cfg.get("provider") or "mega",
-            "remote_root": storage_cfg.get("remote_root", "tiktok-archive"),
-            "generate_public_links": bool(storage_cfg.get("generate_public_links", False)),
+            "provider": storage_cfg.get("provider", default["storage"]["provider"]),
+            "remote_name": storage_cfg.get("remote_name") or storage_cfg.get("provider") or default["storage"]["remote_name"],
+            "remote_root": storage_cfg.get("remote_root", default["storage"]["remote_root"]),
+            "generate_public_links": bool(storage_cfg.get("generate_public_links", default["storage"]["generate_public_links"])),
         },
         "sync": {
-            "parallel_workers": int(sync_cfg.get("parallel_workers", 2)),
-            "upload_retries": int(sync_cfg.get("upload_retries", 3)),
-            "upload_retry_delay": int(sync_cfg.get("upload_retry_delay", 5)),
+            "parallel_workers": int(sync_cfg.get("parallel_workers", default["sync"]["parallel_workers"])),
+            "upload_retries": int(sync_cfg.get("upload_retries", default["sync"]["upload_retries"])),
+            "upload_retry_delay": int(sync_cfg.get("upload_retry_delay", default["sync"]["upload_retry_delay"])),
         },
         "download": {
-            "retries": int(download_cfg.get("retries", 3)),
+            "retries": int(download_cfg.get("retries", default["download"]["retries"])),
         },
     }
 
@@ -74,6 +77,14 @@ def ensure_dir(path):
 
 def file_valid(path):
     return os.path.exists(path) and os.path.getsize(path) >= MIN_VALID_BYTES
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def build_paths(author, video_id):
@@ -95,16 +106,27 @@ def build_paths(author, video_id):
     }
 
 
+def write_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def build_metadata_payload(item, state_fields):
+    payload = deepcopy(item)
+    payload["_archive"] = state_fields
+    return payload
+
+
 def process_item(item, state_snapshot, provider, settings, retry_ids):
     video_id = item.get("id")
     if not video_id:
         return None
 
-    author = item.get("author") or "unknown"
+    author = safe_name(item.get("author") or "unknown")
     paths = build_paths(author, video_id)
     ensure_dir(paths["base_path"])
 
-    state_item = dict(state_snapshot.get(video_id, {}))
+    state_item = dict(state_snapshot.get(video_id, {}) or {})
     result_item = dict(item)
     now = datetime.utcnow().isoformat()
 
@@ -115,50 +137,47 @@ def process_item(item, state_snapshot, provider, settings, retry_ids):
 
     force_retry = (
         video_id in retry_ids
-        or state_item.get("download_status") in {"failed", "upload_failed"}
         or state_item.get("upload_status") in {"failed", "missing_remote", "stale"}
+        or state_item.get("verification_status") not in {None, "verified"}
     )
 
     if state_item.get("upload_status") == "completed" and not force_retry:
-        video_ok, video_info, _ = provider.file_info(paths["remote_video_rel"])
-        meta_ok, meta_info, _ = provider.file_info(paths["remote_meta_rel"])
+        video_ok, video_info, video_error = provider.file_info(paths["remote_video_rel"])
+        meta_ok, meta_info, meta_error = provider.file_info(paths["remote_meta_rel"])
 
         if video_ok and meta_ok:
-            public_url = state_item.get("video_storage_url")
+            public_url = state_item.get("public_link_url")
             public_link_status = state_item.get("public_link_status", "disabled")
 
             if generate_public_links and not public_url:
-                public_url = generate_public_link(provider, paths["remote_video_rel"])
+                public_url, _ = generate_public_link(provider, paths["remote_video_rel"])
                 public_link_status = "created" if public_url else "failed"
 
-            result_item.update({
-                "video_storage_path": paths["remote_video_rel"],
-                "video_storage_url": public_url,
-                "download_status": "skipped",
-                "upload_status": "completed",
-                "verification_status": "verified",
-                "public_link_status": public_link_status,
-                "is_available": True,
-            })
+            view_url = public_url or state_item.get("video_storage_url") or paths["remote_video_rel"]
 
             patch = {
-                "download_status": "completed",
+                "download_status": "skipped",
                 "upload_status": "completed",
                 "verification_status": "verified",
                 "public_link_status": public_link_status,
                 "video_storage_path": paths["remote_video_rel"],
                 "metadata_storage_path": paths["remote_meta_rel"],
-                "video_storage_url": public_url,
+                "video_storage_url": view_url,
+                "public_link_url": public_url,
                 "remote_video_size": video_info.get("Size") if isinstance(video_info, dict) else None,
                 "remote_metadata_size": meta_info.get("Size") if isinstance(meta_info, dict) else None,
                 "is_available": True,
                 "last_error": None,
                 "last_checked_at": now,
             }
+
+            result_item.update(patch)
             return video_id, result_item, patch, {"action": "remove", "video_id": video_id}
 
-    # Download
-    if not file_valid(paths["video_path"]):
+    video_path = paths["video_path"]
+    metadata_path = paths["metadata_path"]
+
+    if not file_valid(video_path):
         video_url = item.get("url")
         if not video_url:
             patch = {
@@ -172,8 +191,8 @@ def process_item(item, state_snapshot, provider, settings, retry_ids):
             result_item.update(patch)
             return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "download_failed", "error": "missing video url"}
 
-        downloaded = download_video(video_url, paths["video_path"], retries=download_retries)
-        if not downloaded or not file_valid(paths["video_path"]):
+        downloaded = download_video(video_url, video_path, retries=download_retries)
+        if not downloaded or not file_valid(video_path):
             patch = {
                 "download_status": "failed",
                 "upload_status": "pending",
@@ -185,77 +204,136 @@ def process_item(item, state_snapshot, provider, settings, retry_ids):
             result_item.update(patch)
             return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "download_failed", "error": "download failed"}
 
-    # Save metadata sidecar
-    with open(paths["metadata_path"], "w", encoding="utf-8") as f:
-        json.dump(item, f, ensure_ascii=False, indent=2)
+    local_video_size = os.path.getsize(video_path)
+    local_video_checksum = sha256_file(video_path)
 
-    last_error = None
+    video_uploaded = upload_file(provider, video_path, paths["remote_video_rel"], retries=upload_retries)
+    if not video_uploaded:
+        patch = {
+            "download_status": "completed",
+            "upload_status": "failed",
+            "verification_status": "not_verified",
+            "is_available": True,
+            "last_error": "video upload failed",
+            "last_checked_at": now,
+            "local_video_size": local_video_size,
+            "local_video_sha256": local_video_checksum,
+        }
+        result_item.update(patch)
+        return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "upload_failed", "error": "video upload failed"}
 
-    for attempt in range(upload_retries):
-        video_uploaded = upload_file(provider, paths["video_path"], paths["remote_video_rel"])
-        meta_uploaded = upload_file(provider, paths["metadata_path"], paths["remote_meta_rel"])
+    video_verified, video_info, video_error = verify_file(provider, video_path, paths["remote_video_rel"])
+    if not video_verified:
+        patch = {
+            "download_status": "completed",
+            "upload_status": "failed",
+            "verification_status": "failed",
+            "is_available": True,
+            "last_error": video_error or "video verification failed",
+            "last_checked_at": now,
+            "local_video_size": local_video_size,
+            "local_video_sha256": local_video_checksum,
+        }
+        result_item.update(patch)
+        return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "verification_failed", "error": video_error or "video verification failed"}
 
-        if not (video_uploaded and meta_uploaded):
-            last_error = f"upload failed on attempt {attempt + 1}"
-            continue
+    public_url = None
+    public_link_status = "disabled"
+    if generate_public_links:
+        public_url, _ = generate_public_link(provider, paths["remote_video_rel"])
+        public_link_status = "created" if public_url else "failed"
 
-        video_verified, video_info, video_error = verify_file(provider, paths["video_path"], paths["remote_video_rel"])
-        meta_verified, meta_info, meta_error = verify_file(provider, paths["metadata_path"], paths["remote_meta_rel"])
+    view_url = public_url or paths["remote_video_rel"]
 
-        if video_verified and meta_verified:
-            public_url = None
-            public_link_status = "disabled"
+    metadata_payload = build_metadata_payload(item, {
+        "download_status": "completed",
+        "upload_status": "completed",
+        "verification_status": "completed",
+        "public_link_status": public_link_status,
+        "video_storage_path": paths["remote_video_rel"],
+        "metadata_storage_path": paths["remote_meta_rel"],
+        "video_storage_url": view_url,
+        "public_link_url": public_url,
+        "local_video_size": local_video_size,
+        "local_video_sha256": local_video_checksum,
+        "remote_video_size": video_info.get("Size") if isinstance(video_info, dict) else local_video_size,
+        "remote_metadata_size": None,
+        "is_available": True,
+        "last_error": None,
+        "last_checked_at": now,
+    })
 
-            if generate_public_links:
-                public_url = generate_public_link(provider, paths["remote_video_rel"])
-                public_link_status = "created" if public_url else "failed"
+    write_json(metadata_path, metadata_payload)
 
-            patch = {
-                "download_status": "completed",
-                "upload_status": "completed",
-                "verification_status": "verified",
-                "public_link_status": public_link_status,
-                "video_storage_path": paths["remote_video_rel"],
-                "metadata_storage_path": paths["remote_meta_rel"],
-                "video_storage_url": public_url,
-                "remote_video_size": video_info.get("Size") if isinstance(video_info, dict) else None,
-                "remote_metadata_size": meta_info.get("Size") if isinstance(meta_info, dict) else None,
-                "is_available": True,
-                "last_error": None,
-                "last_checked_at": now,
-            }
+    metadata_uploaded = upload_file(provider, metadata_path, paths["remote_meta_rel"], retries=upload_retries)
+    if not metadata_uploaded:
+        patch = {
+            "download_status": "completed",
+            "upload_status": "failed",
+            "verification_status": "failed",
+            "public_link_status": public_link_status,
+            "video_storage_path": paths["remote_video_rel"],
+            "metadata_storage_path": paths["remote_meta_rel"],
+            "video_storage_url": view_url,
+            "public_link_url": public_url,
+            "is_available": True,
+            "last_error": "metadata upload failed",
+            "last_checked_at": now,
+            "local_video_size": local_video_size,
+            "local_video_sha256": local_video_checksum,
+        }
+        result_item.update(patch)
+        return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "upload_failed", "error": "metadata upload failed"}
 
-            result_item.update(patch)
-
-            try:
-                if os.path.exists(paths["video_path"]):
-                    os.remove(paths["video_path"])
-                if os.path.exists(paths["metadata_path"]):
-                    os.remove(paths["metadata_path"])
-            except Exception:
-                pass
-
-            return video_id, result_item, patch, {"action": "remove", "video_id": video_id}
-
-        last_error = video_error or meta_error or f"verification failed on attempt {attempt + 1}"
-
-        if attempt < upload_retries - 1:
-            continue
+    metadata_verified, meta_info, meta_error = verify_file(provider, metadata_path, paths["remote_meta_rel"])
+    if not metadata_verified:
+        patch = {
+            "download_status": "completed",
+            "upload_status": "failed",
+            "verification_status": "failed",
+            "public_link_status": public_link_status,
+            "video_storage_path": paths["remote_video_rel"],
+            "metadata_storage_path": paths["remote_meta_rel"],
+            "video_storage_url": view_url,
+            "public_link_url": public_url,
+            "is_available": True,
+            "last_error": meta_error or "metadata verification failed",
+            "last_checked_at": now,
+            "local_video_size": local_video_size,
+            "local_video_sha256": local_video_checksum,
+        }
+        result_item.update(patch)
+        return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "verification_failed", "error": meta_error or "metadata verification failed"}
 
     patch = {
         "download_status": "completed",
-        "upload_status": "failed",
-        "verification_status": "failed",
-        "public_link_status": "disabled" if not generate_public_links else "failed",
-        "video_storage_path": None,
-        "video_storage_url": None,
+        "upload_status": "completed",
+        "verification_status": "verified",
+        "public_link_status": public_link_status,
+        "video_storage_path": paths["remote_video_rel"],
+        "metadata_storage_path": paths["remote_meta_rel"],
+        "video_storage_url": view_url,
+        "public_link_url": public_url,
+        "remote_video_size": video_info.get("Size") if isinstance(video_info, dict) else local_video_size,
+        "remote_metadata_size": meta_info.get("Size") if isinstance(meta_info, dict) else os.path.getsize(metadata_path),
         "is_available": True,
-        "last_error": last_error or "upload/verification failed",
+        "last_error": None,
         "last_checked_at": now,
+        "local_video_size": local_video_size,
+        "local_video_sha256": local_video_checksum,
     }
 
     result_item.update(patch)
-    return video_id, result_item, patch, {"action": "add", "video_id": video_id, "reason": "upload_failed", "error": last_error or "upload/verification failed"}
+
+    try:
+        if os.path.exists(video_path):
+            os.remove(video_path)
+        if os.path.exists(metadata_path):
+            os.remove(metadata_path)
+    except Exception:
+        pass
+
+    return video_id, result_item, patch, {"action": "remove", "video_id": video_id}
 
 
 def main():
@@ -274,9 +352,11 @@ def main():
     for item in data:
         if not isinstance(item, dict):
             continue
+
         video_id = item.get("id")
         if not video_id or video_id in seen_ids:
             continue
+
         seen_ids.add(video_id)
         unique_items.append(item)
 
