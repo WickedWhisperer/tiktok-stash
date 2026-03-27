@@ -1,8 +1,13 @@
 import json
 import os
 
+# Primary source (after download/upload enrichment)
+INPUT_FILE = "archive/derived/enriched_archive.json"
+
+# Fallback if enrichment hasn't run yet
 if not os.path.exists(INPUT_FILE):
     INPUT_FILE = "archive/derived/normalized_archive.json"
+
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
@@ -10,8 +15,10 @@ def normalize_list(value):
     """Ensure value is always a list of strings."""
     if not value:
         return []
+
     if isinstance(value, str):
         return [value.strip()] if value.strip() else []
+
     if isinstance(value, list):
         out = []
         for v in value:
@@ -29,6 +36,7 @@ def normalize_list(value):
                 if candidate:
                     out.append(str(candidate))
         return out
+
     if isinstance(value, dict):
         candidate = (
             value.get("name")
@@ -39,6 +47,7 @@ def normalize_list(value):
         )
         if candidate:
             return [str(candidate)]
+
     return []
 
 
@@ -70,7 +79,6 @@ def build_index():
             f"https://www.tiktok.com/@{author}" if author else None
         )
 
-        # --- SEARCH TEXT ---
         search_parts = [
             str(item.get("caption", "")),
             " ".join(hashtags),
@@ -84,10 +92,10 @@ def build_index():
             str(music.get("title") or ""),
             str(music.get("author") or ""),
         ]
+
         search_text = " ".join(search_parts).lower()
 
         index.append({
-            # --- CORE ---
             "id": item.get("id"),
             "author": author,
             "author_profile": author_profile,
@@ -96,40 +104,35 @@ def build_index():
             "created_at": item.get("created_at"),
             "url": item.get("url"),
 
-            # --- STORAGE SYSTEM (IMPORTANT) ---
+            # storage + download status
             "video_storage_url": item.get("video_storage_url"),
-            "video_storage_path": item.get("video_storage_path"),  # NEW (structured path)
-            "download_status": item.get("download_status", "unknown"),
-            "download_error": item.get("download_error"),          # NEW (debugging)
-            "uploaded_at": item.get("uploaded_at"),                # NEW (sync tracking)
+            "download_status": item.get("download_status"),
+            "upload_status": item.get("upload_status"),
 
-            # --- STATS ---
+            # stats
             "likes": stats.get("likes", 0),
             "views": stats.get("views", 0),
             "comments": stats.get("comments", 0),
             "shares": stats.get("shares", 0),
 
-            # --- TAGS ---
+            # tags
             "hashtags": hashtags,
             "mentions": mentions,
             "detailed_mentions": detailed_mentions,
 
-            # --- MUSIC ---
+            # music
             "music_name": music.get("title"),
             "music_author": music.get("author"),
             "music_url": music.get("play_url"),
             "music_cover": music.get("cover_medium_url"),
 
-            # --- VIDEO META ---
+            # video
             "video_cover_url": video.get("cover_url"),
             "video_duration": video.get("duration"),
-            "video_width": video.get("width"),     # NEW
-            "video_height": video.get("height"),   # NEW
 
-            # --- EXTRA ---
+            # extra
             "media_urls": item.get("media_urls", []),
 
-            # --- SEARCH ---
             "search_text": search_text
         })
 
