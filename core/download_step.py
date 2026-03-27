@@ -1,104 +1,70 @@
 import json
 import os
-import time
+import sys
 
-from downloader import download_video
-from uploader import upload_to_mega, generate_public_link
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from core.downloader import download_video
+from core.uploader import upload_to_mega
 
 INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/derived/enriched_archive.json"
 
 
-def ensure_dirs():
-    os.makedirs("archive/videos", exist_ok=True)
-
-
-def load_existing():
-    if not os.path.exists(OUTPUT_FILE):
-        return {}
-    with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        return {item["id"]: item for item in data}
-
-
-def save_output(data):
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(list(data.values()), f, ensure_ascii=False, indent=2)
-
-
-def main():
-    ensure_dirs()
+def process():
+    if not os.path.exists(INPUT_FILE):
+        raise FileNotFoundError(INPUT_FILE)
 
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
-        items = json.load(f)
+        data = json.load(f)
 
-    existing = load_existing()
+    enriched = []
 
-    for item in items:
+    for item in data:
         video_id = item.get("id")
-        if not video_id:
-            continue
-
         author = item.get("author") or "unknown"
-        safe_author = author.replace("/", "_")
 
-        # Merge with existing state
-        state = existing.get(video_id, item)
+        # CLEAN AUTHOR NAME
+        author = author.replace("/", "_")
 
-        state.setdefault("download_status", "pending")
-        state.setdefault("upload_status", "pending")
-        state.setdefault("video_storage_url", None)
-        state.setdefault("local_path", None)
+        # STRUCTURED PATH
+        base_path = f"archive/media/{author}/{video_id}"
+        os.makedirs(base_path, exist_ok=True)
 
-        # Skip fully processed
-        if state["upload_status"] == "completed":
-            existing[video_id] = state
-            continue
+        video_path = os.path.join(base_path, "video.mp4")
+        metadata_path = os.path.join(base_path, "metadata.json")
 
-        try:
-            # ---------- DOWNLOAD ----------
-            if state["download_status"] != "completed":
-                video_url = item.get("url")
-                if not video_url:
-                    raise Exception("No video URL")
+        # DOWNLOAD
+        if not os.path.exists(video_path):
+            success = download_video(item.get("url"), video_path)
+        else:
+            success = True
 
-                local_path = f"archive/videos/{safe_author}/{video_id}.mp4"
-                os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        if success:
+            # SAVE METADATA
+            with open(metadata_path, "w", encoding="utf-8") as f:
+                json.dump(item, f, ensure_ascii=False, indent=2)
 
-                download_video(video_url, local_path)
+            # UPLOAD FOLDER (NOT FILE)
+            remote_path = f"tiktok-archive/{author}/{video_id}"
 
-                state["download_status"] = "completed"
-                state["local_path"] = local_path
+            upload_success = upload_to_mega(base_path, remote_path)
 
-            # ---------- UPLOAD ----------
-            if state["upload_status"] != "completed":
-                remote_path = f"tiktok-archive/{safe_author}/{video_id}.mp4"
+            if upload_success:
+                item["video_storage_url"] = f"{remote_path}/video.mp4"
+                item["download_status"] = "uploaded"
+            else:
+                item["download_status"] = "upload_failed"
+        else:
+            item["download_status"] = "download_failed"
 
-                success = upload_to_mega(state["local_path"], remote_path)
+        enriched.append(item)
 
-                if not success:
-                    raise Exception("Upload failed")
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(enriched, f, ensure_ascii=False, indent=2)
 
-                link = generate_public_link(remote_path)
-
-                state["upload_status"] = "completed"
-                state["video_storage_url"] = link
-
-                # delete local file after upload
-                if os.path.exists(state["local_path"]):
-                    os.remove(state["local_path"])
-
-            existing[video_id] = state
-
-        except Exception as e:
-            print(f"Failed for {video_id}: {e}")
-            state["download_status"] = state.get("download_status", "failed")
-            state["upload_status"] = "failed"
-            existing[video_id] = state
-
-        save_output(existing)
-        time.sleep(2)
+    print(f"Processed {len(enriched)} items")
 
 
 if __name__ == "__main__":
-    main()
+    process()
