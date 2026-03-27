@@ -161,8 +161,18 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "video_storage_url": "tiktok-archive/flamrzz/7620870073321868566/video.mp4",
-    "download_status": "skipped"
+    "download_status": "completed",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
+    "metadata_storage_path": "flamrzz/7620870073321868566/metadata.json",
+    "video_storage_url": null,
+    "remote_video_size": 1528479,
+    "remote_metadata_size": 9760,
+    "is_available": true,
+    "last_error": null,
+    "last_checked_at": "2026-03-27T18:21:00.383667"
   },
   {
     "id": "7620164000902417666",
@@ -327,8 +337,13 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
+    "video_storage_path": "flamrzz/7620164000902417666/video.mp4",
     "video_storage_url": "tiktok-archive/flamrzz/7620164000902417666/video.mp4",
-    "download_status": "skipped"
+    "download_status": "skipped",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "is_available": true
   },
   {
     "id": "7619757123131559190",
@@ -493,8 +508,13 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
+    "video_storage_path": "flamrzz/7619757123131559190/video.mp4",
     "video_storage_url": "tiktok-archive/flamrzz/7619757123131559190/video.mp4",
-    "download_status": "skipped"
+    "download_status": "skipped",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "is_available": true
   },
   {
     "id": "7619389482399255830",
@@ -640,8 +660,13 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
+    "video_storage_path": "flamrzz/7619389482399255830/video.mp4",
     "video_storage_url": "tiktok-archive/flamrzz/7619389482399255830/video.mp4",
-    "download_status": "skipped"
+    "download_status": "skipped",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "is_available": true
   },
   {
     "id": "7618315955151605014",
@@ -787,7 +812,12 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
+    "video_storage_path": "flamrzz/7618315955151605014/video.mp4",
     "video_storage_url": "tiktok-archive/flamrzz/7618315955151605014/video.mp4",
-    "download_status": "skipped"
+    "download_status": "skipped",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "is_available": true
   }
 ]
