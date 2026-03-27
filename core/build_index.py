@@ -7,7 +7,6 @@ if not os.path.exists(INPUT_FILE):
     INPUT_FILE = "archive/derived/normalized_archive.json"
 
 STATE_FILE = "archive/system/state.json"
-
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
@@ -53,8 +52,14 @@ def normalize_list(value):
 def load_state():
     if not os.path.exists(STATE_FILE):
         return {}
+
     with open(STATE_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+
+    if isinstance(data, dict):
+        return data
+
+    return {}
 
 
 def build_index():
@@ -67,16 +72,14 @@ def build_index():
         data = json.load(f)
 
     state = load_state()
-
     index = []
 
     for item in data:
-        video_id = item.get("id")
-        state_item = state.get(video_id, {})
-
         stats = item.get("stats", {}) or {}
         music = item.get("music", {}) or {}
         video = item.get("video", {}) or {}
+        video_id = item.get("id")
+        state_item = state.get(video_id, {}) or {}
 
         hashtags = normalize_list(item.get("hashtags"))
         mentions = normalize_list(item.get("mentions"))
@@ -115,34 +118,33 @@ def build_index():
             "created_at": item.get("created_at"),
             "url": item.get("url"),
 
-            # state-aware fields
+            "video_storage_path": state_item.get("video_storage_path") or item.get("video_storage_path"),
             "video_storage_url": state_item.get("video_storage_url") or item.get("video_storage_url"),
+            "metadata_storage_path": state_item.get("metadata_storage_path") or item.get("metadata_storage_path"),
             "download_status": state_item.get("download_status") or item.get("download_status"),
             "upload_status": state_item.get("upload_status") or item.get("upload_status"),
-            "is_available": state_item.get("is_available", True),
+            "verification_status": state_item.get("verification_status") or item.get("verification_status"),
+            "public_link_status": state_item.get("public_link_status") or item.get("public_link_status"),
+            "is_available": state_item.get("is_available", item.get("is_available", True)),
+            "last_error": state_item.get("last_error") or item.get("last_error"),
 
-            # stats
             "likes": stats.get("likes", 0),
             "views": stats.get("views", 0),
             "comments": stats.get("comments", 0),
             "shares": stats.get("shares", 0),
 
-            # tags
             "hashtags": hashtags,
             "mentions": mentions,
             "detailed_mentions": detailed_mentions,
 
-            # music
             "music_name": music.get("title"),
             "music_author": music.get("author"),
             "music_url": music.get("play_url"),
             "music_cover": music.get("cover_medium_url"),
 
-            # video
             "video_cover_url": video.get("cover_url"),
             "video_duration": video.get("duration"),
 
-            # extra
             "media_urls": item.get("media_urls", []),
 
             "search_text": search_text
