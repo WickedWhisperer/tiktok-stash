@@ -2,25 +2,35 @@ import subprocess
 import time
 
 
-def upload_file(local_path, remote_path, retries=3):
-    for attempt in range(retries):
-        result = subprocess.run(
-            ["rclone", "copy", local_path, remote_path],
-            capture_output=True
-        )
-
-        if result.returncode == 0:
+def upload_to_mega(local_path, remote_path):
+    for attempt in range(3):
+        try:
+            subprocess.run(
+                [
+                    "rclone",
+                    "copy",
+                    local_path,
+                    f"mega:{remote_path}",
+                    "--create-empty-src-dirs"
+                ],
+                check=True
+            )
             return True
-
-        time.sleep(2)
+        except Exception as e:
+            print(f"Upload attempt {attempt+1} failed: {e}")
+            time.sleep(5)
 
     return False
 
 
-def file_exists(remote_path):
-    result = subprocess.run(
-        ["rclone", "lsf", remote_path],
-        capture_output=True
-    )
-
-    return result.returncode == 0 and result.stdout.strip() != ""
+def generate_public_link(remote_path):
+    try:
+        result = subprocess.run(
+            ["rclone", "link", f"mega:{remote_path}"],
+            capture_output=True,
+            text=True
+        )
+        return result.stdout.strip()
+    except Exception as e:
+        print(f"Failed to generate link: {e}")
+        return None
