@@ -1,26 +1,16 @@
 import json
-import os
 import subprocess
 import time
-from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Type
-
-
-@dataclass
-class StorageConfig:
-    provider: str = "mega"
-    remote_name: str = "mega"
-    remote_root: str = "tiktok-archive"
-    generate_public_links: bool = False
+from typing import Dict, Optional, Tuple
 
 
 class RcloneStorageProvider:
     def __init__(self, remote_name: str = "mega", remote_root: str = "tiktok-archive"):
         self.remote_name = remote_name
-        self.remote_root = remote_root.strip("/")
+        self.remote_root = (remote_root or "").strip("/")
 
     def remote_file(self, relative_path: str) -> str:
-        relative_path = relative_path.lstrip("/")
+        relative_path = str(relative_path or "").lstrip("/")
         if self.remote_root:
             return f"{self.remote_name}:{self.remote_root}/{relative_path}"
         return f"{self.remote_name}:{relative_path}"
@@ -71,7 +61,7 @@ class RcloneStorageProvider:
         if not exists:
             return False, None, error
 
-        if info and isinstance(info, dict) and os.path.exists(local_path):
+        if info and isinstance(info, dict):
             remote_size = info.get("Size")
             if remote_size is not None:
                 try:
@@ -116,7 +106,7 @@ class S3Provider(RcloneStorageProvider):
     pass
 
 
-PROVIDER_MAP: Dict[str, Type[RcloneStorageProvider]] = {
+PROVIDER_MAP = {
     "mega": MegaProvider,
     "drive": GoogleDriveProvider,
     "google_drive": GoogleDriveProvider,
