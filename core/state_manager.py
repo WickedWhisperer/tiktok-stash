@@ -9,8 +9,11 @@ def load_state():
     if not os.path.exists(STATE_FILE):
         return {}
 
-    with open(STATE_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return {}
 
     if isinstance(data, dict):
         return data
@@ -34,6 +37,7 @@ def update_video(state, video_id, data):
 
 def mark_deleted_missing(state, current_ids):
     now = datetime.utcnow().isoformat()
+
     for video_id in list(state.keys()):
         if video_id not in current_ids:
             state[video_id] = {
