@@ -1,7 +1,7 @@
 import json
 import os
 
-INPUT_FILE = "archive/derived/normalized_archive.json"
+INPUT_FILE = "archive/derived/enriched_archive.json"
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
@@ -18,7 +18,6 @@ def normalize_list(value):
                 if v.strip():
                     out.append(v.strip())
             elif isinstance(v, dict):
-                # fallback: get some text if dict (legacy)
                 candidate = (
                     v.get("name")
                     or v.get("title")
@@ -94,6 +93,10 @@ def build_index():
             "caption": item.get("caption"),
             "created_at": item.get("created_at"),
             "url": item.get("url"),
+
+            # 🔴 NEW: storage + download status
+            "video_storage_url": item.get("video_storage_url"),
+            "download_status": item.get("download_status"),
 
             # stats
             "likes": stats.get("likes", 0),
