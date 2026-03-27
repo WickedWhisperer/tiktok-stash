@@ -1,6 +1,6 @@
 import os
 
-TRACK_FILE = "archive/downloaded.txt"
+TRACK_FILE = "archive/meta/downloaded.txt"
 
 def is_downloaded(video_id):
     if not os.path.exists(TRACK_FILE):
