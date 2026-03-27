@@ -1,29 +1,51 @@
 import json
+import os
 from core.downloader import download_video
+from core.tracker import is_downloaded, mark_downloaded
 
 INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/derived/enriched_archive.json"
 
 
 def run():
+    if not os.path.exists(INPUT_FILE):
+        raise FileNotFoundError(INPUT_FILE)
+
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    for item in data:
-        url = item.get("url")
-        video_id = item.get("id")
+    updated = 0
 
-        if not url or not video_id:
+    for item in data:
+        video_id = item.get("id")
+        url = item.get("url")
+
+        if not video_id or not url:
             continue
 
-        local_path = download_video(url, video_id)
+        # Skip already downloaded
+        if is_downloaded(video_id):
+            item["video_storage_url"] = f"archive/media/{video_id}.mp4"
+            item["download_status"] = "skipped"
+            continue
 
-        item["local_video_path"] = local_path
+        print(f"Downloading: {video_id}")
+
+        path = download_video(url, video_id)
+
+        if path:
+            item["video_storage_url"] = path
+            item["download_status"] = "success"
+            mark_downloaded(video_id)
+            updated += 1
+        else:
+            item["video_storage_url"] = None
+            item["download_status"] = "failed"
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print(f"Downloaded videos for {len(data)} items")
+    print(f"Downloaded {updated} new videos")
 
 
 if __name__ == "__main__":
