@@ -1,27 +1,26 @@
 import subprocess
 
 
-def download_video(url, output_path):
-    try:
-        result = subprocess.run(
-            [
-                "yt-dlp",
-                "-o",
-                output_path,
-                "-f",
-                "mp4/best",
-                url
-            ],
-            capture_output=True,
-            text=True
-        )
+def download_video(url, output_path, retries=3):
+    for attempt in range(retries):
+        try:
+            result = subprocess.run(
+                [
+                    "yt-dlp",
+                    "-f", "mp4",
+                    "-o", output_path,
+                    url
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
 
-        if result.returncode != 0:
-            print("yt-dlp error:", result.stderr)
-            return False
+            if result.returncode == 0:
+                return True
+            else:
+                print(f"Download failed (attempt {attempt+1}): {result.stderr.decode(errors='ignore')}")
 
-        return True
+        except Exception as e:
+            print(f"Exception during download: {e}")
 
-    except Exception as e:
-        print("Download exception:", str(e))
-        return False
+    return False
