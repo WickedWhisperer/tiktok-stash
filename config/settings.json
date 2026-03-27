@@ -1,13 +1,24 @@
 {
   "collector": "apify",
+
   "input": {
     "profiles": ["flamrzz"],
     "profileScrapeSections": ["videos"],
     "profileSorting": "latest",
     "resultsPerPage": 5,
     "maxProfilesPerQuery": 1,
-    "shouldDownloadVideos": false,
-    "shouldDownloadSubtitles": false,
-    "shouldDownloadCovers": false
+    "shouldDownloadVideos": false
+  },
+
+  "storage": {
+    "provider": "mega",
+    "structured_paths": true,
+    "delete_local_after_upload": true,
+    "generate_public_links": false
+  },
+
+  "download": {
+    "retries": 3,
+    "timeout": 60
   }
 }
