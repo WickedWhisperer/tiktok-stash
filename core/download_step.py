@@ -6,10 +6,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.downloader import download_video
 from core.uploader import upload_to_mega
-from core.state_manager import load_state, save_state, update_video, mark_deleted_missing
+from core.state_manager import (
+    load_state,
+    save_state,
+    update_video,
+    mark_deleted_missing
+)
 
 INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/derived/enriched_archive.json"
+
+
+def file_valid(path):
+    return os.path.exists(path) and os.path.getsize(path) > 50 * 1024
 
 
 def process():
@@ -25,44 +34,45 @@ def process():
 
     for item in data:
         video_id = item.get("id")
-        author = item.get("author") or "unknown"
-        author = author.replace("/", "_")
+        author = (item.get("author") or "unknown").replace("/", "_")
 
         current_ids.add(video_id)
 
         existing = state.get(video_id, {})
 
-        # SKIP if already successfully uploaded
+        base_path = f"archive/videos/{author}/{video_id}"
+        os.makedirs(base_path, exist_ok=True)
+
+        video_path = os.path.join(base_path, "video.mp4")
+        metadata_path = os.path.join(base_path, "metadata.json")
+
+        # --- SKIP IF ALREADY COMPLETE ---
         if existing.get("upload_status") == "completed":
             item["video_storage_url"] = existing.get("video_storage_url")
             item["download_status"] = "skipped"
             enriched.append(item)
             continue
 
-        base_path = f"archive/media/{author}/{video_id}"
-        os.makedirs(base_path, exist_ok=True)
+        # --- DOWNLOAD ---
+        if not file_valid(video_path):
+            success = download_video(item.get("url"), video_path)
 
-        video_path = os.path.join(base_path, "video.mp4")
-        metadata_path = os.path.join(base_path, "metadata.json")
+            if not success or not file_valid(video_path):
+                update_video(state, video_id, {
+                    "download_status": "failed",
+                    "upload_status": "pending"
+                })
+                item["download_status"] = "failed"
+                enriched.append(item)
+                continue
 
-        # DOWNLOAD
-        success = download_video(item.get("url"), video_path)
-
-        if not success:
-            update_video(state, video_id, {
-                "download_status": "failed",
-                "upload_status": "pending"
-            })
-            item["download_status"] = "failed"
-            enriched.append(item)
-            continue
-
-        # SAVE METADATA
+        # --- SAVE METADATA ---
         with open(metadata_path, "w", encoding="utf-8") as f:
             json.dump(item, f, ensure_ascii=False, indent=2)
 
-        # UPLOAD
+        # --- UPLOAD ---
         remote_path = f"tiktok-archive/{author}/{video_id}"
+
         upload_success = upload_to_mega(base_path, remote_path)
 
         if upload_success:
@@ -77,6 +87,13 @@ def process():
 
             item["video_storage_url"] = storage_url
             item["download_status"] = "completed"
+            item["upload_status"] = "completed"
+
+            # optional cleanup
+            try:
+                os.remove(video_path)
+            except:
+                pass
 
         else:
             update_video(state, video_id, {
@@ -85,10 +102,11 @@ def process():
             })
 
             item["download_status"] = "upload_failed"
+            item["upload_status"] = "failed"
 
         enriched.append(item)
 
-    # DELETION DETECTION
+    # --- DELETION DETECTION ---
     mark_deleted_missing(state, current_ids)
 
     save_state(state)
