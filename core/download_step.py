@@ -1,52 +1,47 @@
 import json
 import os
-from core.downloader import download_video
-from core.tracker import is_downloaded, mark_downloaded
+from downloader import download_video
+from tracker import is_downloaded, mark_downloaded
 
 INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/derived/enriched_archive.json"
 
 
-def run():
+def main():
     if not os.path.exists(INPUT_FILE):
         raise FileNotFoundError(INPUT_FILE)
 
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    updated = 0
+    enriched = []
 
     for item in data:
         video_id = item.get("id")
-        url = item.get("url")
+        video_url = item.get("url")
 
-        if not video_id or not url:
-            continue
+        local_path = None
 
-        # Skip already downloaded
-        if is_downloaded(video_id):
-            item["video_storage_url"] = f"archive/media/{video_id}.mp4"
-            item["download_status"] = "skipped"
-            continue
+        if video_id and video_url:
+            if not is_downloaded(video_id):
+                try:
+                    local_path = download_video(video_url, video_id)
+                    mark_downloaded(video_id)
+                except Exception as e:
+                    print(f"Download failed: {video_id} → {e}")
+            else:
+                local_path = f"archive/videos/{video_id}.mp4"
 
-        print(f"Downloading: {video_id}")
+        item["local_video"] = local_path
+        enriched.append(item)
 
-        path = download_video(url, video_id)
-
-        if path:
-            item["video_storage_url"] = path
-            item["download_status"] = "success"
-            mark_downloaded(video_id)
-            updated += 1
-        else:
-            item["video_storage_url"] = None
-            item["download_status"] = "failed"
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(enriched, f, ensure_ascii=False, indent=2)
 
-    print(f"Downloaded {updated} new videos")
+    print(f"Enriched {len(enriched)} items")
 
 
 if __name__ == "__main__":
-    run()
+    main()
