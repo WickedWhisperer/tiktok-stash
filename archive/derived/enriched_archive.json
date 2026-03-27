@@ -166,7 +166,7 @@
     "verification_status": "failed",
     "is_available": true,
     "last_error": "name 'os' is not defined",
-    "last_checked_at": "2026-03-27T19:01:07.091700",
+    "last_checked_at": "2026-03-27T19:01:31.187755",
     "local_video_size": 1528479,
     "local_video_sha256": "b1af19feab3ebabe73b2be4d8127bcc860838288d2874fb8acb045087ccd3dcc"
   },
@@ -345,7 +345,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:07.090641"
+    "last_checked_at": "2026-03-27T19:01:31.186482"
   },
   {
     "id": "7619757123131559190",
@@ -522,7 +522,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:07.091430"
+    "last_checked_at": "2026-03-27T19:01:31.187395"
   },
   {
     "id": "7619389482399255830",
@@ -680,7 +680,7 @@
     "remote_metadata_size": 6453,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:10.236915"
+    "last_checked_at": "2026-03-27T19:01:33.953773"
   },
   {
     "id": "7618315955151605014",
@@ -838,6 +838,6 @@
     "remote_metadata_size": 6463,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:10.633109"
+    "last_checked_at": "2026-03-27T19:01:34.964473"
   }
 ]
