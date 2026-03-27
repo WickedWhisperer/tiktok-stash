@@ -17,7 +17,7 @@
     "generate_public_links": false
   },
   "sync": {
-    "parallel_workers": 2,
+    "parallel_workers": 3,
     "upload_retries": 3,
     "upload_retry_delay": 5
   },
