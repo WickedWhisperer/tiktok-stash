@@ -1,18 +1,17 @@
 import json
 import os
 
-# Primary source (after download/upload enrichment)
 INPUT_FILE = "archive/derived/enriched_archive.json"
 
-# Fallback if enrichment hasn't run yet
 if not os.path.exists(INPUT_FILE):
     INPUT_FILE = "archive/derived/normalized_archive.json"
+
+STATE_FILE = "archive/system/state.json"
 
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
 def normalize_list(value):
-    """Ensure value is always a list of strings."""
     if not value:
         return []
 
@@ -51,6 +50,13 @@ def normalize_list(value):
     return []
 
 
+def load_state():
+    if not os.path.exists(STATE_FILE):
+        return {}
+    with open(STATE_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def build_index():
     if not os.path.exists(INPUT_FILE):
         raise FileNotFoundError(INPUT_FILE)
@@ -60,9 +66,14 @@ def build_index():
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    state = load_state()
+
     index = []
 
     for item in data:
+        video_id = item.get("id")
+        state_item = state.get(video_id, {})
+
         stats = item.get("stats", {}) or {}
         music = item.get("music", {}) or {}
         video = item.get("video", {}) or {}
@@ -96,7 +107,7 @@ def build_index():
         search_text = " ".join(search_parts).lower()
 
         index.append({
-            "id": item.get("id"),
+            "id": video_id,
             "author": author,
             "author_profile": author_profile,
             "author_avatar": item.get("author_avatar"),
@@ -104,10 +115,11 @@ def build_index():
             "created_at": item.get("created_at"),
             "url": item.get("url"),
 
-            # storage + download status
-            "video_storage_url": item.get("video_storage_url"),
-            "download_status": item.get("download_status"),
-            "upload_status": item.get("upload_status"),
+            # state-aware fields
+            "video_storage_url": state_item.get("video_storage_url") or item.get("video_storage_url"),
+            "download_status": state_item.get("download_status") or item.get("download_status"),
+            "upload_status": state_item.get("upload_status") or item.get("upload_status"),
+            "is_available": state_item.get("is_available", True),
 
             # stats
             "likes": stats.get("likes", 0),
