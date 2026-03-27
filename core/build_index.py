@@ -53,8 +53,11 @@ def load_state():
     if not os.path.exists(STATE_FILE):
         return {}
 
-    with open(STATE_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return {}
 
     if isinstance(data, dict):
         return data
@@ -119,14 +122,20 @@ def build_index():
             "url": item.get("url"),
 
             "video_storage_path": state_item.get("video_storage_path") or item.get("video_storage_path"),
-            "video_storage_url": state_item.get("video_storage_url") or item.get("video_storage_url"),
             "metadata_storage_path": state_item.get("metadata_storage_path") or item.get("metadata_storage_path"),
+            "video_storage_url": state_item.get("video_storage_url") or item.get("video_storage_url"),
+            "public_link_url": state_item.get("public_link_url") or item.get("public_link_url"),
             "download_status": state_item.get("download_status") or item.get("download_status"),
             "upload_status": state_item.get("upload_status") or item.get("upload_status"),
             "verification_status": state_item.get("verification_status") or item.get("verification_status"),
             "public_link_status": state_item.get("public_link_status") or item.get("public_link_status"),
             "is_available": state_item.get("is_available", item.get("is_available", True)),
             "last_error": state_item.get("last_error") or item.get("last_error"),
+
+            "local_video_size": state_item.get("local_video_size") or item.get("local_video_size"),
+            "local_video_sha256": state_item.get("local_video_sha256") or item.get("local_video_sha256"),
+            "remote_video_size": state_item.get("remote_video_size") or item.get("remote_video_size"),
+            "remote_metadata_size": state_item.get("remote_metadata_size") or item.get("remote_metadata_size"),
 
             "likes": stats.get("likes", 0),
             "views": stats.get("views", 0),
