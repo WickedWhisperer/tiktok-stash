@@ -10,12 +10,16 @@ def load_state():
         return {}
 
     with open(STATE_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+
+    if isinstance(data, dict):
+        return data
+
+    return {}
 
 
 def save_state(state):
     os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
 
@@ -29,6 +33,11 @@ def update_video(state, video_id, data):
 
 
 def mark_deleted_missing(state, current_ids):
-    for vid in state:
-        if vid not in current_ids:
-            state[vid]["is_available"] = False
+    now = datetime.utcnow().isoformat()
+    for video_id in list(state.keys()):
+        if video_id not in current_ids:
+            state[video_id] = {
+                **state.get(video_id, {}),
+                "is_available": False,
+                "last_updated": now
+            }
