@@ -2,6 +2,7 @@ import json
 import os
 from downloader import download_video
 from tracker import is_downloaded, mark_downloaded
+from uploader import upload_to_mega
 
 INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/derived/enriched_archive.json"
@@ -19,20 +20,33 @@ def main():
     for item in data:
         video_id = item.get("id")
         video_url = item.get("url")
+        author = item.get("author")
 
-        local_path = None
+        cloud_url = None
 
         if video_id and video_url:
             if not is_downloaded(video_id):
                 try:
-                    local_path = download_video(video_url, video_id)
-                    mark_downloaded(video_id)
-                except Exception as e:
-                    print(f"Download failed: {video_id} → {e}")
-            else:
-                local_path = f"archive/videos/{video_id}.mp4"
+                    # 1. Download
+                    local_path = download_video(video_url, video_id, author)
 
-        item["local_video"] = local_path
+                    # 2. Upload to MEGA
+                    remote_path = f"{author}/{video_id}.mp4"
+                    cloud_url = upload_to_mega(local_path, remote_path)
+
+                    # 3. Delete local file
+                    os.remove(local_path)
+
+                    mark_downloaded(video_id)
+
+                except Exception as e:
+                    print(f"Failed: {video_id} → {e}")
+            else:
+                cloud_url = f"mega:{author}/{video_id}.mp4"
+
+        item["video_url"] = cloud_url
+        item["storage"] = "mega"
+
         enriched.append(item)
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
