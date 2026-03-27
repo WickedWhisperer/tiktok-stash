@@ -161,18 +161,13 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
+    "video_storage_url": null,
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "disabled",
-    "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
-    "metadata_storage_path": "flamrzz/7620870073321868566/metadata.json",
-    "video_storage_url": null,
-    "remote_video_size": 1528479,
-    "remote_metadata_size": 9760,
-    "is_available": true,
-    "last_error": null,
-    "last_checked_at": "2026-03-27T18:21:00.383667"
+    "is_available": true
   },
   {
     "id": "7620164000902417666",
