@@ -1,7 +1,8 @@
 import json
 import os
 
-INPUT_FILE = "archive/derived/enriched_archive.json"
+if not os.path.exists(INPUT_FILE):
+    INPUT_FILE = "archive/derived/normalized_archive.json"
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
