@@ -19,22 +19,58 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Ensure folders exist
-      - name: Ensure archive structure exists
+      - name: Ensure folders
         run: |
           mkdir -p archive/raw
           mkdir -p archive/derived
           mkdir -p archive/search
           mkdir -p archive/videos
           mkdir -p archive/meta
-          
-      # Fix Python imports
+
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$PWD/core" >> $GITHUB_ENV
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          pip install -r requirements.txt
+          pip install yt-dlp
+
+      # 🔥 Install rclone
+      - name: Install rclone
+        run: |
+          curl https://rclone.org/install.sh | sudo bash
+
+      # 🔐 Setup rclone config from secret
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONFIG }}" > ~/.config/rclone/rclone.conf
+
+      - name: Collect
+        run: python main.py
+
+      - name: Normalize
+        run: python core/normalize.py
+
+      - name: Download + Upload
+        run: python core/download_step.py
+
+      - name: Build index
+        run: python core/build_index.py
+
+      - name: Commit archive
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add archive/
+          git commit -m "Update archive (cloud-backed)" || echo "No changes"
+          git push
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
