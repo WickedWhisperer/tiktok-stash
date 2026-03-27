@@ -1,21 +1,16 @@
-import os
 import yt_dlp
+import os
+import time
 
 
-def sanitize(text):
-    """Make safe folder/file names."""
-    if not text:
-        return "unknown"
-    return "".join(c for c in text if c.isalnum() or c in ("_", "-")).strip()
+def get_output_path(author, video_id):
+    return f"archive/media/{author}/{video_id}.mp4"
 
 
-def download_video(url, video_id, author):
-    safe_author = sanitize(author)
-    folder = f"archive/videos/{safe_author}"
+def download_video(url, video_id, author="unknown", retries=3):
+    output_path = get_output_path(author, video_id)
 
-    os.makedirs(folder, exist_ok=True)
-
-    output_path = os.path.join(folder, f"{video_id}.mp4")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     ydl_opts = {
         "outtmpl": output_path,
@@ -24,7 +19,17 @@ def download_video(url, video_id, author):
         "noplaylist": True,
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+    for attempt in range(retries):
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
 
-    return output_path
+            if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                return output_path
+
+        except Exception as e:
+            print(f"[Retry {attempt+1}] Download failed: {e}")
+            time.sleep(2)
+
+    print(f"[FAILED] Could not download {video_id}")
+    return None
