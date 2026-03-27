@@ -161,11 +161,11 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "uploaded",
+    "download_status": "skipped",
+    "video_storage_path": null,
     "video_storage_url": null,
-    "video_storage_path": "mega:tiktok-archive/flamrzz/7620870073321868566.mp4",
-    "download_error": null,
-    "uploaded_at": "2026-03-27T12:23:05.214291"
+    "uploaded_at": null,
+    "is_available": true
   },
   {
     "id": "7620164000902417666",
@@ -330,11 +330,11 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "uploaded",
+    "download_status": "skipped",
+    "video_storage_path": null,
     "video_storage_url": null,
-    "video_storage_path": "mega:tiktok-archive/flamrzz/7620164000902417666.mp4",
-    "download_error": null,
-    "uploaded_at": "2026-03-27T12:23:09.121536"
+    "uploaded_at": null,
+    "is_available": true
   },
   {
     "id": "7619757123131559190",
@@ -499,11 +499,11 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "uploaded",
+    "download_status": "skipped",
+    "video_storage_path": null,
     "video_storage_url": null,
-    "video_storage_path": "mega:tiktok-archive/flamrzz/7619757123131559190.mp4",
-    "download_error": null,
-    "uploaded_at": "2026-03-27T12:23:14.345416"
+    "uploaded_at": null,
+    "is_available": true
   },
   {
     "id": "7619389482399255830",
@@ -649,11 +649,11 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "uploaded",
+    "download_status": "skipped",
+    "video_storage_path": null,
     "video_storage_url": null,
-    "video_storage_path": "mega:tiktok-archive/flamrzz/7619389482399255830.mp4",
-    "download_error": null,
-    "uploaded_at": "2026-03-27T12:23:18.844580"
+    "uploaded_at": null,
+    "is_available": true
   },
   {
     "id": "7618315955151605014",
@@ -799,10 +799,10 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "uploaded",
+    "download_status": "skipped",
+    "video_storage_path": null,
     "video_storage_url": null,
-    "video_storage_path": "mega:tiktok-archive/flamrzz/7618315955151605014.mp4",
-    "download_error": null,
-    "uploaded_at": "2026-03-27T12:23:26.730181"
+    "uploaded_at": null,
+    "is_available": true
   }
 ]
