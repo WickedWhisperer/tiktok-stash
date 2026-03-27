@@ -1,31 +1,18 @@
-import subprocess
-import os
+from core.storage import get_storage_provider
 
 
-def upload_to_mega(local_path, remote_path):
-    """
-    Upload a file or folder to Mega using rclone
-    """
-    try:
-        result = subprocess.run(
-            [
-                "rclone",
-                "copy",
-                local_path,
-                f"mega:{remote_path}",
-                "--create-empty-src-dirs"
-            ],
-            capture_output=True,
-            text=True
-        )
+def build_provider(storage_config=None):
+    return get_storage_provider(storage_config)
 
-        if result.returncode != 0:
-            print("Upload failed:", result.stderr)
-            return False
 
-        print(f"Uploaded → {remote_path}")
-        return True
+def upload_file(provider, local_path, remote_relative_path, retries=3):
+    return provider.upload_file(local_path, remote_relative_path, retries=retries)
 
-    except Exception as e:
-        print("Upload error:", str(e))
-        return False
+
+def verify_file(provider, local_path, remote_relative_path):
+    return provider.verify_file(local_path, remote_relative_path)
+
+
+def generate_public_link(provider, remote_relative_path):
+    link, _ = provider.public_link(remote_relative_path)
+    return link
