@@ -28,7 +28,6 @@ jobs:
           mkdir -p archive/derived
           mkdir -p archive/search
           mkdir -p archive/videos
-          mkdir -p archive/system
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -40,29 +39,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # FIXED RCLONE SETUP
       - name: Setup rclone
         uses: AnimMouse/setup-rclone@v1
         with:
           rclone_config: ${{ secrets.RCLONE_CONFIG }}
 
-      - name: Run TikTok collector
+      - name: Run collector
         run: python main.py
 
-      - name: Normalize archive
+      - name: Normalize
         run: python core/normalize.py
 
-      # IMPORTANT FIX HERE
-      - name: Download and upload videos
-        run: python -m core.download_step
+      - name: Download + Upload + Enrich
+        run: python core/download_step.py
 
-      - name: Build search index
+      - name: Build index
         run: python core/build_index.py
 
-      - name: Commit and push archive
+      - name: Commit and push
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add archive/
-          git commit -m "Update archive (videos + cloud sync)" || echo "No changes to commit"
+          git commit -m "Update archive (stateful sync)" || echo "No changes"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
