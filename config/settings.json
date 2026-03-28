@@ -19,7 +19,8 @@
   "sync": {
     "parallel_workers": 3,
     "upload_retries": 3,
-    "upload_retry_delay": 5
+    "upload_retry_delay": 5,
+    "delete_local_after_upload": true
   },
   "download": {
     "retries": 3
