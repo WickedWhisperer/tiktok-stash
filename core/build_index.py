@@ -2,7 +2,6 @@ import json
 import os
 
 INPUT_FILE = "archive/derived/enriched_archive.json"
-
 if not os.path.exists(INPUT_FILE):
     INPUT_FILE = "archive/derived/normalized_archive.json"
 
@@ -59,10 +58,7 @@ def load_state():
     except Exception:
         return {}
 
-    if isinstance(data, dict):
-        return data
-
-    return {}
+    return data if isinstance(data, dict) else {}
 
 
 def build_index():
@@ -109,7 +105,6 @@ def build_index():
             str(music.get("title") or ""),
             str(music.get("author") or ""),
         ]
-
         search_text = " ".join(search_parts).lower()
 
         index.append({
@@ -143,8 +138,8 @@ def build_index():
             "views": stats.get("views", 0),
             "comments": stats.get("comments", 0),
             "shares": stats.get("shares", 0),
-            "favorites": stats.get("favorites", 0),
-            "reposts": stats.get("reposts", 0),
+            "favorites": stats.get("favorites", stats.get("collectCount", 0)),
+            "reposts": stats.get("reposts", stats.get("repostCount", 0)),
 
             "hashtags": hashtags,
             "mentions": mentions,
