@@ -51,6 +51,7 @@
     z-index: 1;
   }
 
+  /* ── HEADER ── */
   .header {
     position: sticky;
     top: 0;
@@ -63,9 +64,9 @@
   .header-inner {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 16px 18px;
+    padding: 14px 18px;
     display: grid;
-    gap: 14px;
+    gap: 12px;
   }
 
   .brand-row {
@@ -119,10 +120,11 @@
     color: var(--text);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 14px 16px 14px 44px;
+    padding: 12px 40px 12px 44px;
     font-size: 14px;
+    font-family: inherit;
     outline: none;
-    transition: border-color .18s, box-shadow .18s, transform .18s;
+    transition: border-color .18s, box-shadow .18s;
   }
 
   .search input:focus {
@@ -130,7 +132,7 @@
     box-shadow: 0 0 0 4px rgba(0,242,234,0.08);
   }
 
-  .search svg {
+  .search-icon {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -138,6 +140,26 @@
     opacity: .5;
     pointer-events: none;
   }
+
+  /* Clear button inside search input */
+  .search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    border-radius: 50%;
+    display: none;
+    font-size: 16px;
+    transition: color .15s;
+  }
+  .search-clear:hover { color: var(--text); }
+  .search-clear.visible { display: block; }
 
   .toolbar {
     display: grid;
@@ -147,7 +169,7 @@
   .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
   }
 
@@ -157,27 +179,47 @@
     background: var(--surface);
     color: var(--text);
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 9px 14px;
     font: inherit;
     font-size: 13px;
     outline: none;
     cursor: pointer;
-    transition: border-color .18s, background .18s, transform .18s;
+    transition: border-color .18s, background .18s;
   }
 
   select:focus, .toggle:focus, .mini-btn:focus {
     border-color: rgba(0,242,234,0.7);
   }
 
-  .toggle.active, .mini-btn.active {
+  .toggle.active {
     background: rgba(0,242,234,0.1);
     border-color: rgba(0,242,234,0.42);
+    color: var(--cyan);
   }
+
+  .mini-btn:hover {
+    border-color: var(--border-2);
+    background: var(--surface-2);
+  }
+
+  /* Active filter dot indicator */
+  .filter-active-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--cyan);
+    border-radius: 50%;
+    margin-left: 4px;
+    vertical-align: middle;
+    opacity: 0;
+    transition: opacity .18s;
+  }
+  .filter-active-dot.on { opacity: 1; }
 
   .meta-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     justify-content: space-between;
   }
@@ -185,7 +227,7 @@
   .status {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 7px;
     align-items: center;
     color: var(--muted);
     font-size: 12px;
@@ -194,20 +236,103 @@
   .badge {
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.03);
-    padding: 6px 10px;
+    padding: 5px 10px;
     border-radius: 999px;
     white-space: nowrap;
+    font-size: 12px;
   }
 
-  .badge.good { color: var(--good); }
-  .badge.warn { color: var(--warn); }
-  .badge.cyan { color: var(--cyan); }
+  .badge.good { color: var(--good); border-color: rgba(57,217,138,0.2); }
+  .badge.warn { color: var(--warn); border-color: rgba(255,204,0,0.2); }
+  .badge.cyan { color: var(--cyan); border-color: rgba(0,242,234,0.2); }
+  .badge.muted { color: var(--muted); }
 
+  /* Clear all filters button */
+  .clear-filters-btn {
+    background: none;
+    border: 1px solid rgba(255,45,85,0.3);
+    color: var(--pink);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    display: none;
+  }
+  .clear-filters-btn.visible { display: inline-block; }
+  .clear-filters-btn:hover { background: rgba(255,45,85,0.08); }
+
+  /* ── BANNERS ── */
+  .offline-banner, .error-banner, .update-banner {
+    max-width: 1280px;
+    margin: 10px auto 0;
+    padding: 0 18px;
+  }
+
+  .banner {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.03);
+    color: var(--soft);
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .banner strong { color: var(--text); }
+
+  .banner-dismiss {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 4px;
+    flex-shrink: 0;
+    transition: color .15s;
+  }
+  .banner-dismiss:hover { color: var(--text); }
+
+  /* ── RESULTS AREA ── */
   .results {
     max-width: 1280px;
     margin: 0 auto;
     padding: 18px;
   }
+
+  /* Active hashtag filter strip */
+  .tag-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .tag-filter-bar:empty { display: none; }
+
+  .active-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,242,234,0.4);
+    background: rgba(0,242,234,0.08);
+    color: var(--cyan);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+
+  .active-tag-chip:hover { background: rgba(0,242,234,0.14); }
+  .active-tag-chip .x { font-size: 14px; opacity: .7; }
 
   .loading, .empty, .error {
     min-height: 48vh;
@@ -233,10 +358,11 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: 0 0; }
+    0%   { background-position: 0 0; }
     100% { background-position: 100% 0; }
   }
 
+  /* ── GRID / FEED ── */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -251,6 +377,7 @@
     margin: 0 auto;
   }
 
+  /* ── CARD ── */
   .card {
     position: relative;
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
@@ -300,6 +427,7 @@
     background-position: center;
     filter: saturate(1.05);
     opacity: .82;
+    transition: opacity .3s;
   }
 
   .poster::after {
@@ -375,7 +503,7 @@
     background: rgba(0,0,0,0.44);
     color: white;
     border: 1px solid rgba(255,255,255,0.12);
-    padding: 8px 10px;
+    padding: 7px 10px;
     border-radius: 999px;
     font-size: 12px;
     backdrop-filter: blur(8px);
@@ -412,30 +540,45 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 10px;
+    gap: 5px;
+    padding: 6px 10px;
     border-radius: 999px;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.03);
     color: var(--soft);
     font-size: 12px;
     text-decoration: none;
+    transition: background .15s, border-color .15s;
   }
 
-  .chip.cyan { color: var(--cyan); }
+  .chip.cyan {
+    color: var(--cyan);
+    cursor: pointer;
+  }
+  .chip.cyan:hover {
+    background: rgba(0,242,234,0.08);
+    border-color: rgba(0,242,234,0.3);
+  }
+  /* Highlight when that hashtag is actively filtering */
+  .chip.cyan.tag-active {
+    background: rgba(0,242,234,0.14);
+    border-color: rgba(0,242,234,0.5);
+  }
+
   .chip.pink { color: var(--pink); }
+  .chip.pink:hover { background: rgba(255,45,85,0.06); }
 
   .stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
 
   .stat {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 10px;
+    gap: 5px;
+    padding: 6px 10px;
     border-radius: 999px;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.03);
@@ -446,7 +589,7 @@
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
 
   .btn {
@@ -459,8 +602,9 @@
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 10px 12px;
+    padding: 9px 12px;
     font-size: 13px;
+    font-family: inherit;
     cursor: pointer;
     transition: border-color .18s, transform .18s, background .18s;
   }
@@ -481,25 +625,6 @@
     border-color: rgba(255,45,85,0.34);
   }
 
-  .status-line {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .status-pill {
-    font-size: 11px;
-    padding: 6px 9px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    background: rgba(255,255,255,0.02);
-  }
-
-  .status-pill.good { color: var(--good); }
-  .status-pill.warn { color: var(--warn); }
-  .status-pill.cyan { color: var(--cyan); }
-
   .feed-shell {
     scroll-snap-type: y proximity;
   }
@@ -512,35 +637,108 @@
     padding-bottom: 18px;
   }
 
-  .offline-banner, .error-banner {
-    max-width: 1280px;
-    margin: 12px auto 0;
-    padding: 0 18px;
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 0 8px;
+    flex-wrap: wrap;
   }
 
-  .banner {
+  .page-btn {
+    padding: 9px 16px;
+    border-radius: 12px;
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 14px;
-    background: rgba(255,255,255,0.03);
-    color: var(--soft);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
     font-size: 13px;
-    line-height: 1.5;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
   }
 
-  .banner strong { color: var(--text); }
+  .page-btn:hover {
+    border-color: rgba(0,242,234,0.4);
+    background: rgba(0,242,234,0.06);
+  }
+
+  .page-btn.active {
+    background: rgba(0,242,234,0.12);
+    border-color: rgba(0,242,234,0.45);
+    color: var(--cyan);
+    font-weight: 600;
+  }
+
+  .page-btn:disabled {
+    opacity: .35;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .page-info {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+
+  /* ── SW UPDATE TOAST ── */
+  .update-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+    background: var(--surface);
+    border: 1px solid rgba(0,242,234,0.35);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--soft);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: transform .3s, opacity .3s;
+    max-width: 300px;
+  }
+
+  .update-toast.visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .update-toast strong { color: var(--text); }
+
+  .update-toast button {
+    background: rgba(0,242,234,0.12);
+    border: 1px solid rgba(0,242,234,0.35);
+    color: var(--cyan);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
 
   .hidden { display: none !important; }
 
-  @media (min-width: 980px) {
-    .meta-row {
-      align-items: flex-start;
-    }
+  @media (max-width: 600px) {
+    .header-inner { padding: 12px 14px; }
+    .results { padding: 14px; }
+    .search-wrap { grid-template-columns: 1fr; }
+    .controls { gap: 6px; }
+    select, .toggle, .mini-btn { font-size: 12px; padding: 8px 11px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
+
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="brand-row">
@@ -551,11 +749,12 @@
 
         <div class="search-wrap">
           <div class="search">
-            <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="search-icon" width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="M21 21l-4.35-4.35"></path>
             </svg>
-            <input id="searchInput" type="text" placeholder="Search captions, hashtags, authors, music, mentions…" autocomplete="off">
+            <input id="searchInput" type="search" placeholder="Search captions, hashtags, authors, music…" autocomplete="off" spellcheck="false">
+            <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">×</button>
           </div>
 
           <div class="controls">
@@ -589,33 +788,40 @@
             <option value="365">Last year</option>
           </select>
 
-          <button class="mini-btn" id="refreshBtn" type="button">Refresh</button>
+          <button class="mini-btn" id="refreshBtn" type="button">↺ Reload index</button>
         </div>
 
         <div class="meta-row">
           <div class="status" id="statusBar">
             <span class="badge cyan" id="resultsMeta">Loading…</span>
-            <span class="badge" id="modeMeta">Grid mode</span>
-            <span class="badge" id="cacheMeta">Cache inactive</span>
+            <span class="badge muted" id="modeMeta">Grid mode</span>
+            <span class="badge muted hidden" id="cacheMeta">Cache used</span>
           </div>
-          <div class="status">
-            <span class="badge good" id="publicLinkMeta">Public links enabled</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="clear-filters-btn" id="clearFiltersBtn" type="button">✕ Clear filters</button>
+            <span class="badge good hidden" id="onlineMeta">Online</span>
+            <span class="badge warn hidden" id="offlineMeta">Offline</span>
           </div>
         </div>
       </div>
     </div>
   </header>
 
+  <!-- BANNERS -->
   <div class="offline-banner hidden" id="offlineBanner">
     <div class="banner">
-      <strong>Offline mode:</strong> showing cached archive data. Video playback may fall back to posters or open-link buttons until the network comes back.
+      <span><strong>Offline mode:</strong> showing cached archive data. Video playback may fall back to posters or open-link buttons.</span>
+      <button class="banner-dismiss" id="offlineDismiss" type="button" aria-label="Dismiss">×</button>
     </div>
   </div>
 
   <div class="error-banner hidden" id="errorBanner">
-    <div class="banner" id="errorBox"></div>
+    <div class="banner">
+      <span id="errorBox"></span>
+    </div>
   </div>
 
+  <!-- MAIN -->
   <main class="results">
     <div class="loading" id="loadingState">
       <div>
@@ -628,39 +834,68 @@
       </div>
     </div>
 
+    <!-- Active hashtag filter strip -->
+    <div class="tag-filter-bar" id="tagFilterBar"></div>
+
     <section id="resultsShell" class="grid hidden"></section>
+
+    <div id="paginationShell" class="pagination hidden"></div>
   </main>
 </div>
 
-<script>
-const DATA_URL = '../archive/search/search_index.json';
-const CACHE_NAME = 'tiktok-stash-ui-v2';
-const MODE_KEY = 'tiktok-stash-ui-mode-v2';
+<!-- SW Update Toast -->
+<div class="update-toast" id="updateToast">
+  <span><strong>Update available</strong><br>A new version of Stash is ready.</span>
+  <button id="updateBtn" type="button">Reload</button>
+</div>
 
-let allItems = [];
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const DATA_URL   = '../archive/search/search_index.json';
+const CACHE_NAME = 'tiktok-stash-ui-v3';
+const MODE_KEY   = 'tiktok-stash-ui-mode-v2';
+const PAGE_SIZE  = 60; // cards per page in grid; feed uses same
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let allItems      = [];
 let filteredItems = [];
-let currentMode = localStorage.getItem(MODE_KEY) || 'grid';
+let currentMode   = localStorage.getItem(MODE_KEY) || 'grid';
 let activeObserver = null;
 let activePlayingVideo = null;
+let activeHashtag = '';   // hashtag currently being filtered by click
+let currentPage   = 1;
+let searchDebounceTimer = null;
+let waitingWorker = null;
 
+// ─── ELEMENTS ─────────────────────────────────────────────────────────────────
 const els = {
-  loadingState: document.getElementById('loadingState'),
-  resultsShell: document.getElementById('resultsShell'),
-  searchInput: document.getElementById('searchInput'),
-  authorFilter: document.getElementById('authorFilter'),
-  sortSelect: document.getElementById('sortSelect'),
-  dateFilter: document.getElementById('dateFilter'),
-  resultsMeta: document.getElementById('resultsMeta'),
-  modeMeta: document.getElementById('modeMeta'),
-  cacheMeta: document.getElementById('cacheMeta'),
-  errorBanner: document.getElementById('errorBanner'),
-  errorBox: document.getElementById('errorBox'),
-  offlineBanner: document.getElementById('offlineBanner'),
-  gridModeBtn: document.getElementById('gridModeBtn'),
-  feedModeBtn: document.getElementById('feedModeBtn'),
-  refreshBtn: document.getElementById('refreshBtn')
+  loadingState:    document.getElementById('loadingState'),
+  resultsShell:    document.getElementById('resultsShell'),
+  paginationShell: document.getElementById('paginationShell'),
+  tagFilterBar:    document.getElementById('tagFilterBar'),
+  searchInput:     document.getElementById('searchInput'),
+  searchClear:     document.getElementById('searchClear'),
+  authorFilter:    document.getElementById('authorFilter'),
+  sortSelect:      document.getElementById('sortSelect'),
+  dateFilter:      document.getElementById('dateFilter'),
+  resultsMeta:     document.getElementById('resultsMeta'),
+  modeMeta:        document.getElementById('modeMeta'),
+  cacheMeta:       document.getElementById('cacheMeta'),
+  onlineMeta:      document.getElementById('onlineMeta'),
+  offlineMeta:     document.getElementById('offlineMeta'),
+  errorBanner:     document.getElementById('errorBanner'),
+  errorBox:        document.getElementById('errorBox'),
+  offlineBanner:   document.getElementById('offlineBanner'),
+  offlineDismiss:  document.getElementById('offlineDismiss'),
+  clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+  gridModeBtn:     document.getElementById('gridModeBtn'),
+  feedModeBtn:     document.getElementById('feedModeBtn'),
+  refreshBtn:      document.getElementById('refreshBtn'),
+  updateToast:     document.getElementById('updateToast'),
+  updateBtn:       document.getElementById('updateBtn'),
 };
 
+// ─── UTILS ────────────────────────────────────────────────────────────────────
 function escHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -678,7 +913,7 @@ function fmt(n) {
   const num = Number(n);
   if (!Number.isFinite(num) || num < 0) return '—';
   if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
-  if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+  if (num >= 1_000)     return (num / 1_000).toFixed(1) + 'K';
   return String(num);
 }
 
@@ -686,19 +921,14 @@ function formatDate(iso) {
   if (!iso) return '';
   try {
     return new Date(iso).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+      day: 'numeric', month: 'short', year: 'numeric'
     });
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
 function initials(name) {
   const s = String(name || '?').trim();
-  if (!s) return '?';
-  return s.slice(0, 2).toUpperCase();
+  return s ? s.slice(0, 2).toUpperCase() : '?';
 }
 
 function normalizeList(value) {
@@ -720,11 +950,16 @@ function normalizeList(value) {
   return [];
 }
 
+/**
+ * highlight() — safely escapes text first, then marks query matches.
+ * query is also escaped so special regex characters don't cause errors.
+ */
 function highlight(text, query) {
   const safe = escHtml(text || '');
   const q = String(query || '').trim();
   if (!q) return safe;
-  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Escape query for regex (operates on already-html-escaped string)
+  const escaped = escHtml(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   try {
     return safe.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
   } catch {
@@ -735,18 +970,16 @@ function highlight(text, query) {
 function getStat(item, key) {
   const direct = item?.[key];
   if (direct != null && Number.isFinite(Number(direct))) return Number(direct);
-
   const stats = item?.stats || {};
   const aliases = {
-    likes: ['likes', 'diggCount', 'digg'],
-    views: ['views', 'playCount'],
-    comments: ['comments', 'commentCount'],
-    shares: ['shares', 'shareCount'],
+    likes:     ['likes', 'diggCount', 'digg'],
+    views:     ['views', 'playCount'],
+    comments:  ['comments', 'commentCount'],
+    shares:    ['shares', 'shareCount'],
     favorites: ['favorites', 'collectCount'],
-    reposts: ['reposts', 'repostCount']
+    reposts:   ['reposts', 'repostCount']
   };
-
-  for (const candidate of aliases[key] || [key]) {
+  for (const candidate of (aliases[key] || [key])) {
     if (stats[candidate] != null && Number.isFinite(Number(stats[candidate]))) {
       return Number(stats[candidate]);
     }
@@ -759,8 +992,8 @@ function isHttpUrl(value) {
 }
 
 function getPlaybackUrl(item) {
-  if (isHttpUrl(item?.public_link_url)) return item.public_link_url;
-  if (isHttpUrl(item?.video_storage_url)) return item.video_storage_url;
+  if (isHttpUrl(item?.public_link_url))    return item.public_link_url;
+  if (isHttpUrl(item?.video_storage_url))  return item.video_storage_url;
   return '';
 }
 
@@ -772,36 +1005,64 @@ function getStorageLabel(item) {
   return item?.video_storage_path || item?.metadata_storage_path || '';
 }
 
+function debounce(fn, delay) {
+  return (...args) => {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// ─── URL STATE (hash-based) ───────────────────────────────────────────────────
+function serializeState() {
+  const params = new URLSearchParams();
+  const q = els.searchInput.value.trim();
+  if (q)                           params.set('q', q);
+  if (els.authorFilter.value)      params.set('author', els.authorFilter.value);
+  if (els.sortSelect.value !== 'likes') params.set('sort', els.sortSelect.value);
+  if (els.dateFilter.value)        params.set('date', els.dateFilter.value);
+  if (activeHashtag)               params.set('tag', activeHashtag);
+  if (currentPage > 1)             params.set('page', currentPage);
+  const str = params.toString();
+  history.replaceState(null, '', str ? `#${str}` : location.pathname + location.search);
+}
+
+function restoreState() {
+  const hash = location.hash.replace(/^#/, '');
+  if (!hash) return;
+  const params = new URLSearchParams(hash);
+  if (params.has('q'))      els.searchInput.value = params.get('q');
+  if (params.has('author')) els.authorFilter.value = params.get('author');
+  if (params.has('sort'))   els.sortSelect.value = params.get('sort');
+  if (params.has('date'))   els.dateFilter.value = params.get('date');
+  if (params.has('tag'))    activeHashtag = params.get('tag');
+  if (params.has('page'))   currentPage = Math.max(1, parseInt(params.get('page'), 10) || 1);
+  updateSearchClearBtn();
+}
+
+// ─── CACHE ───────────────────────────────────────────────────────────────────
 async function loadCachedIndex() {
   if (!('caches' in window)) return [];
   try {
-    const cache = await caches.open(CACHE_NAME);
+    const cache  = await caches.open(CACHE_NAME);
     const cached = await cache.match(DATA_URL);
     if (!cached) return [];
     const data = await cached.json();
     return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 async function saveIndexCache(items) {
   if (!('caches' in window)) return;
   try {
     const cache = await caches.open(CACHE_NAME);
-    await cache.put(
-      DATA_URL,
-      new Response(JSON.stringify(items), {
-        headers: { 'Content-Type': 'application/json' }
-      })
-    );
-    els.cacheMeta.textContent = 'Cache updated';
-  } catch {
-    els.cacheMeta.textContent = 'Cache limited';
-  }
+    await cache.put(DATA_URL, new Response(JSON.stringify(items), {
+      headers: { 'Content-Type': 'application/json' }
+    }));
+  } catch {}
 }
 
-function setMode(mode) {
+// ─── MODE ─────────────────────────────────────────────────────────────────────
+function setMode(mode, skipRender = false) {
   currentMode = mode === 'feed' ? 'feed' : 'grid';
   localStorage.setItem(MODE_KEY, currentMode);
 
@@ -812,32 +1073,59 @@ function setMode(mode) {
   if (currentMode === 'feed') {
     els.resultsShell.classList.remove('grid');
     els.resultsShell.classList.add('feed', 'feed-shell');
+    els.paginationShell.classList.add('hidden');
   } else {
     els.resultsShell.classList.remove('feed', 'feed-shell');
     els.resultsShell.classList.add('grid');
   }
 
-  render();
+  if (!skipRender) render();
 }
 
+// ─── AUTHORS ─────────────────────────────────────────────────────────────────
 function populateAuthors() {
-  const authors = [...new Set(allItems.map(item => item.author).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const authors = [...new Set(allItems.map(i => i.author).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   const selected = els.authorFilter.value;
   els.authorFilter.innerHTML = '<option value="">All authors</option>';
   authors.forEach(author => {
     const opt = document.createElement('option');
     opt.value = author;
-    opt.textContent = '@' + author;
+    opt.textContent = `@${author}`;
     els.authorFilter.appendChild(opt);
   });
-  els.authorFilter.value = selected;
+  // Restore saved selection if valid
+  if (authors.includes(selected)) els.authorFilter.value = selected;
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+function hasActiveFilters() {
+  return els.searchInput.value.trim() ||
+         els.authorFilter.value ||
+         els.dateFilter.value ||
+         activeHashtag;
+}
+
+function updateClearFiltersBtn() {
+  els.clearFiltersBtn.classList.toggle('visible', !!hasActiveFilters());
+}
+
+function clearAllFilters() {
+  els.searchInput.value = '';
+  els.authorFilter.value = '';
+  els.dateFilter.value = '';
+  activeHashtag = '';
+  currentPage = 1;
+  updateSearchClearBtn();
+  updateClearFiltersBtn();
+  updateTagFilterBar();
+  render();
 }
 
 function applyFilters() {
-  const query = els.searchInput.value.trim().toLowerCase();
+  const query  = els.searchInput.value.trim().toLowerCase();
   const author = els.authorFilter.value;
-  const sort = els.sortSelect.value;
-  const days = parseInt(els.dateFilter.value, 10) || 0;
+  const sort   = els.sortSelect.value;
+  const days   = parseInt(els.dateFilter.value, 10) || 0;
 
   let items = [...allItems];
 
@@ -847,6 +1135,14 @@ function applyFilters() {
 
   if (author) {
     items = items.filter(item => item.author === author);
+  }
+
+  if (activeHashtag) {
+    const tagLower = activeHashtag.toLowerCase().replace(/^#/, '');
+    items = items.filter(item => {
+      const tags = normalizeList(item.hashtags);
+      return tags.some(h => h.toLowerCase().replace(/^#/, '') === tagLower);
+    });
   }
 
   if (days) {
@@ -860,7 +1156,7 @@ function applyFilters() {
 
   items.sort((a, b) => {
     if (sort === 'date_desc') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-    if (sort === 'date_asc') return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    if (sort === 'date_asc')  return new Date(a.created_at || 0) - new Date(b.created_at || 0);
     return getStat(b, sort) - getStat(a, sort);
   });
 
@@ -868,55 +1164,77 @@ function applyFilters() {
   return items;
 }
 
-function videoStatusPills(item) {
-  const pills = [];
-  const download = item.download_status || 'unknown';
-  const upload = item.upload_status || 'unknown';
-  const verify = item.verification_status || 'unknown';
-  const pub = item.public_link_status || 'unknown';
-
-  pills.push(`<span class="status-pill ${download === 'completed' ? 'good' : download === 'failed' ? 'warn' : ''}">Download: ${escHtml(download)}</span>`);
-  pills.push(`<span class="status-pill ${upload === 'completed' ? 'good' : upload === 'failed' ? 'warn' : ''}">Upload: ${escHtml(upload)}</span>`);
-  pills.push(`<span class="status-pill ${verify === 'verified' ? 'good' : verify === 'failed' ? 'warn' : ''}">Verify: ${escHtml(verify)}</span>`);
-  pills.push(`<span class="status-pill ${pub === 'created' ? 'good' : pub === 'failed' ? 'warn' : ''}">Link: ${escHtml(pub)}</span>`);
-  if (item.is_available === false) {
-    pills.push(`<span class="status-pill warn">Unavailable</span>`);
+// ─── TAG FILTER BAR ───────────────────────────────────────────────────────────
+function updateTagFilterBar() {
+  if (!activeHashtag) {
+    els.tagFilterBar.innerHTML = '';
+    return;
   }
-  return pills.join('');
+  const tag = activeHashtag.replace(/^#/, '');
+  els.tagFilterBar.innerHTML = `
+    <button class="active-tag-chip" id="removeTagBtn" type="button">
+      #${escHtml(tag)} <span class="x">×</span>
+    </button>
+  `;
+  document.getElementById('removeTagBtn').addEventListener('click', () => {
+    activeHashtag = '';
+    currentPage = 1;
+    updateTagFilterBar();
+    updateClearFiltersBtn();
+    render();
+  });
 }
 
-function buildCard(item, idx, query) {
-  const playback = getPlaybackUrl(item);
-  const openUrl = getOpenUrl(item);
-  const poster = item.video_cover_url || item.music_cover || '';
-  const feedClass = currentMode === 'feed' ? 'feed-mode' : '';
-  const avatarUrl = item.author_avatar || '';
-  const authorUrl = item.author_profile || `https://www.tiktok.com/@${encodeURIComponent(item.author || 'unknown')}`;
-  const musicUrl = item.music_url || '';
-  const tiktokUrl = item.url || '#';
+// ─── HASHTAG CLICK FILTER ────────────────────────────────────────────────────
+function handleHashtagClick(tag) {
+  const clean = tag.replace(/^#/, '');
+  if (activeHashtag.replace(/^#/, '') === clean) {
+    // Toggle off
+    activeHashtag = '';
+  } else {
+    activeHashtag = clean;
+  }
+  currentPage = 1;
+  updateTagFilterBar();
+  updateClearFiltersBtn();
+  render();
+}
 
-  const hashtags = normalizeList(item.hashtags);
-  const mentions = normalizeList(item.mentions);
+// ─── SEARCH CLEAR BUTTON ─────────────────────────────────────────────────────
+function updateSearchClearBtn() {
+  const hasValue = !!els.searchInput.value;
+  els.searchClear.classList.toggle('visible', hasValue);
+}
+
+// ─── CARD BUILDER ─────────────────────────────────────────────────────────────
+function buildCard(item, idx, query) {
+  const playback   = getPlaybackUrl(item);
+  const openUrl    = getOpenUrl(item);
+  const poster     = item.video_cover_url || item.music_cover || '';
+  const feedClass  = currentMode === 'feed' ? 'feed-mode' : '';
+  const avatarUrl  = item.author_avatar || '';
+  const authorUrl  = item.author_profile || `https://www.tiktok.com/@${encodeURIComponent(item.author || 'unknown')}`;
+  const musicUrl   = item.music_url || '';
+  const tiktokUrl  = item.url || '#';
+
+  const hashtags       = normalizeList(item.hashtags);
+  const mentions       = normalizeList(item.mentions);
   const detailedMentions = Array.isArray(item.detailed_mentions) ? item.detailed_mentions : [];
 
-  const musicTitle = item.music_name || '';
+  const musicTitle  = item.music_name || '';
   const musicAuthor = item.music_author || '';
-  const dateText = formatDate(item.created_at);
-  const caption = item.caption || '';
+  const dateText    = formatDate(item.created_at);
+  const caption     = item.caption || '';
 
   const stats = [
-    ['likes', getStat(item, 'likes')],
-    ['views', getStat(item, 'views')],
-    ['comments', getStat(item, 'comments')],
-    ['shares', getStat(item, 'shares')],
-    ['favorites', getStat(item, 'favorites')],
-    ['reposts', getStat(item, 'reposts')]
-  ];
+    ['❤️', getStat(item, 'likes')],
+    ['👁', getStat(item, 'views')],
+    ['💬', getStat(item, 'comments')],
+    ['↗️', getStat(item, 'shares')],
+    ['⭐', getStat(item, 'favorites')],
+  ].filter(([, v]) => v > 0); // Only show non-zero stats
 
   const storageLabel = getStorageLabel(item);
-  const storageChip = storageLabel
-    ? `<span class="chip">Storage: ${escHtml(storageLabel)}</span>`
-    : '';
 
   const mentionLinks = mentions.map(m => {
     const clean = String(m).replace(/^@/, '').trim();
@@ -927,7 +1245,7 @@ function buildCard(item, idx, query) {
   const detailedMentionLinks = detailedMentions
     .map(m => {
       if (!m || typeof m !== 'object') return '';
-      const user = m.username || m.userUniqueId || m.unique_id || m.name || '';
+      const user  = m.username || m.userUniqueId || m.unique_id || m.name || '';
       const clean = String(user).replace(/^@/, '').trim();
       return clean
         ? `<a class="chip" href="https://www.tiktok.com/@${encodeURIComponent(clean)}" target="_blank" rel="noopener">@${escHtml(clean)}</a>`
@@ -936,12 +1254,17 @@ function buildCard(item, idx, query) {
     .filter(Boolean)
     .join('');
 
-  const hashtagChips = hashtags.map(h => `<span class="chip cyan">#${escHtml(String(h).replace(/^#/, ''))}</span>`).join('');
+  const hashtagChips = hashtags.map(h => {
+    const tag    = String(h).replace(/^#/, '');
+    const isActive = activeHashtag.replace(/^#/, '') === tag.toLowerCase() ||
+                     activeHashtag.replace(/^#/, '') === tag;
+    return `<button class="chip cyan${isActive ? ' tag-active' : ''}" data-hashtag="${escAttr(tag)}" type="button">#${escHtml(tag)}</button>`;
+  }).join('');
 
   return `
     <article class="card ${feedClass}" data-id="${escAttr(item.id || idx)}">
       <div class="media">
-        <div class="poster" data-poster="${escAttr(poster)}" ${poster ? `style="background-image:url('${escAttr(poster)}')"` : ''}></div>
+        <div class="poster" ${poster ? `style="background-image:url('${escAttr(poster)}')"` : ''}></div>
         <video
           class="player archive-video"
           muted
@@ -959,7 +1282,9 @@ function buildCard(item, idx, query) {
           <div class="overlay-top">
             <div style="display:flex;align-items:center;gap:10px;min-width:0;">
               <div class="avatar">
-                ${avatarUrl ? `<img src="${escAttr(avatarUrl)}" alt="${escAttr(item.author || 'author')}" loading="lazy">` : escHtml(initials(item.author))}
+                ${avatarUrl
+                  ? `<img src="${escAttr(avatarUrl)}" alt="${escAttr(item.author || 'author')}" loading="lazy">`
+                  : escHtml(initials(item.author))}
               </div>
               <div class="handle">
                 <a href="${escAttr(authorUrl)}" target="_blank" rel="noopener">@${escHtml(item.author || 'unknown')}</a>
@@ -970,36 +1295,38 @@ function buildCard(item, idx, query) {
           </div>
 
           <div class="overlay-bottom">
-            <div class="status-line">
-              ${videoStatusPills(item)}
-            </div>
+            <div></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-              ${musicUrl ? `<a class="btn" href="${escAttr(musicUrl)}" target="_blank" rel="noopener">Music</a>` : ''}
-              ${playback ? `<a class="btn primary" href="${escAttr(openUrl)}" target="_blank" rel="noopener">Open video</a>` : `<a class="btn primary" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">Open TikTok</a>`}
+              ${musicUrl ? `<a class="btn" href="${escAttr(musicUrl)}" target="_blank" rel="noopener">🎵 Music</a>` : ''}
+              ${playback
+                ? `<a class="btn primary" href="${escAttr(openUrl)}" target="_blank" rel="noopener">Open video</a>`
+                : `<a class="btn primary" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">Open TikTok</a>`}
             </div>
           </div>
         </div>
       </div>
 
       <div class="info">
-        <div class="caption">${highlight(caption, query)}</div>
+        ${caption ? `<div class="caption">${highlight(caption, query)}</div>` : ''}
 
         <div class="chips">
           ${hashtagChips}
           ${mentionLinks}
           ${detailedMentionLinks}
-          ${musicTitle ? `<a class="chip" href="${escAttr(musicUrl || tiktokUrl)}" target="_blank" rel="noopener">🎵 ${highlight(musicTitle, query)}${musicAuthor ? ' · ' + escHtml(musicAuthor) : ''}</a>` : ''}
-          ${storageChip}
+          ${musicTitle
+            ? `<a class="chip" href="${escAttr(musicUrl || tiktokUrl)}" target="_blank" rel="noopener">🎵 ${highlight(musicTitle, query)}${musicAuthor ? ' · ' + escHtml(musicAuthor) : ''}</a>`
+            : ''}
         </div>
 
+        ${stats.length ? `
         <div class="stats">
-          ${stats.map(([name, value]) => `<span class="stat">${escHtml(name)}: ${fmt(value)}</span>`).join('')}
-        </div>
+          ${stats.map(([icon, value]) => `<span class="stat">${escHtml(icon)} ${fmt(value)}</span>`).join('')}
+        </div>` : ''}
 
         <div class="actions">
-          ${playback ? `<button class="btn pink copy-link-btn" type="button" data-copy="${escAttr(playback)}">Copy public link</button>` : ''}
-          ${storageLabel ? `<button class="btn" type="button" data-copy="${escAttr(storageLabel)}">Copy storage path</button>` : ''}
-          <a class="btn" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">Open TikTok</a>
+          ${playback ? `<button class="btn pink copy-link-btn" type="button" data-copy="${escAttr(playback)}">Copy link</button>` : ''}
+          ${storageLabel ? `<button class="btn" type="button" data-copy="${escAttr(storageLabel)}">Copy path</button>` : ''}
+          <a class="btn" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">TikTok</a>
           ${item.public_link_url ? `<a class="btn" href="${escAttr(item.public_link_url)}" target="_blank" rel="noopener">Public link</a>` : ''}
         </div>
       </div>
@@ -1007,30 +1334,140 @@ function buildCard(item, idx, query) {
   `;
 }
 
-function cleanupVideos() {
-  document.querySelectorAll('.archive-video').forEach(video => {
-    try {
-      video.pause();
-    } catch {}
+// ─── PAGINATION ───────────────────────────────────────────────────────────────
+function buildPagination(total) {
+  if (currentMode === 'feed') {
+    els.paginationShell.classList.add('hidden');
+    return;
+  }
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) {
+    els.paginationShell.classList.add('hidden');
+    return;
+  }
+
+  els.paginationShell.classList.remove('hidden');
+
+  const maxVisible = 7;
+  let pages = [];
+
+  if (totalPages <= maxVisible) {
+    pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  } else {
+    pages = [1];
+    if (currentPage > 3) pages.push('…');
+    for (let p = Math.max(2, currentPage - 1); p <= Math.min(totalPages - 1, currentPage + 1); p++) {
+      pages.push(p);
+    }
+    if (currentPage < totalPages - 2) pages.push('…');
+    pages.push(totalPages);
+  }
+
+  const html = `
+    <button class="page-btn" id="prevPage" type="button" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>
+    ${pages.map(p =>
+      p === '…'
+        ? `<span class="page-info">…</span>`
+        : `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}" type="button">${p}</button>`
+    ).join('')}
+    <button class="page-btn" id="nextPage" type="button" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+    <span class="page-info">${currentPage} / ${totalPages}</span>
+  `;
+
+  els.paginationShell.innerHTML = html;
+
+  document.getElementById('prevPage')?.addEventListener('click', () => goToPage(currentPage - 1));
+  document.getElementById('nextPage')?.addEventListener('click', () => goToPage(currentPage + 1));
+  document.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page, 10)));
   });
 }
 
-function setupPlayback() {
+function goToPage(page) {
+  const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
+  currentPage = Math.max(1, Math.min(page, totalPages));
+  renderPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function cleanupVideos() {
   if (activeObserver) {
     activeObserver.disconnect();
     activeObserver = null;
   }
+  document.querySelectorAll('.archive-video').forEach(video => {
+    try { video.pause(); } catch {}
+  });
+  activePlayingVideo = null;
+}
 
+function renderPage() {
+  cleanupVideos();
+
+  const query = els.searchInput.value.trim();
+  const items = filteredItems;
+
+  if (!items.length) {
+    els.resultsShell.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <div>
+          <h2 style="margin:0 0 10px;color:var(--text);">No results found</h2>
+          <p style="margin:0;">Try changing the search, filters, or clear active hashtags.</p>
+        </div>
+      </div>
+    `;
+    els.paginationShell.classList.add('hidden');
+    setupCopyButtons();
+    return;
+  }
+
+  // Paginate
+  const start      = (currentPage - 1) * PAGE_SIZE;
+  const pageItems  = currentMode === 'feed' ? items : items.slice(start, start + PAGE_SIZE);
+
+  els.resultsShell.innerHTML = pageItems
+    .map((item, idx) => buildCard(item, start + idx, query))
+    .join('');
+
+  buildPagination(items.length);
+  setupPlayback();
+  setupCopyButtons();
+  setupHashtagButtons();
+}
+
+function render() {
+  applyFilters();
+  updateClearFiltersBtn();
+  serializeState();
+
+  const count = filteredItems.length;
+  const total = allItems.length;
+  els.resultsMeta.textContent =
+    count === total
+      ? `${count} video${count === 1 ? '' : 's'}`
+      : `${count} of ${total} video${total === 1 ? '' : 's'}`;
+
+  // Clamp page to valid range after filtering
+  const totalPages = Math.ceil(count / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+
+  renderPage();
+}
+
+// ─── PLAYBACK ─────────────────────────────────────────────────────────────────
+function setupPlayback() {
   const videos = [...document.querySelectorAll('.archive-video')];
   if (!videos.length) return;
 
   activeObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      const video = entry.target;
-      const src = video.getAttribute('data-src');
-      const poster = video.getAttribute('poster') || '';
+      const video    = entry.target;
+      const src      = video.getAttribute('data-src');
       const posterEl = video.closest('.card')?.querySelector('.poster');
 
+      // Lazy-load src only when near viewport
       if (entry.isIntersecting && src && !video.getAttribute('src')) {
         video.src = src;
         video.load();
@@ -1044,16 +1481,15 @@ function setupPlayback() {
           activePlayingVideo = video;
           try {
             video.muted = true;
-            video.playsInline = true;
             const p = video.play();
-            if (p && typeof p.catch === 'function') p.catch(() => {});
+            if (p?.catch) p.catch(() => {});
           } catch {}
         } else if (entry.intersectionRatio < 0.35) {
           try { video.pause(); } catch {}
         }
       }
 
-      if (posterEl && poster) {
+      if (posterEl) {
         posterEl.style.opacity = entry.isIntersecting ? '0.18' : '0.82';
       }
     });
@@ -1065,79 +1501,70 @@ function setupPlayback() {
 
   videos.forEach(video => {
     video.addEventListener('error', () => {
-      const card = video.closest('.card');
-      if (card) {
-        const poster = card.querySelector('.poster');
-        if (poster) poster.style.opacity = '1';
-        video.style.display = 'none';
-      }
-    });
+      const card   = video.closest('.card');
+      const poster = card?.querySelector('.poster');
+      if (poster) poster.style.opacity = '1';
+      video.style.display = 'none';
+    }, { once: true });
     activeObserver.observe(video);
   });
 
   if (currentMode === 'feed') {
-    const firstVideo = document.querySelector('.archive-video');
-    if (firstVideo) {
-      setTimeout(() => {
-        try {
-          firstVideo.play().catch(() => {});
-        } catch {}
-      }, 250);
-    }
-  } else {
-    cleanupVideos();
+    setTimeout(() => {
+      try { document.querySelector('.archive-video')?.play().catch(() => {}); } catch {}
+    }, 250);
   }
 }
 
+// ─── COPY BUTTONS ─────────────────────────────────────────────────────────────
 function setupCopyButtons() {
   document.querySelectorAll('[data-copy]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const value = btn.getAttribute('data-copy');
       if (!value) return;
-
       try {
         await navigator.clipboard.writeText(value);
         const prev = btn.textContent;
-        btn.textContent = 'Copied';
-        setTimeout(() => { btn.textContent = prev; }, 900);
+        btn.textContent = 'Copied ✓';
+        setTimeout(() => { btn.textContent = prev; }, 1200);
       } catch {
-        alert('Copy failed');
+        // Fallback for browsers that block clipboard
+        const ta = document.createElement('textarea');
+        ta.value = value;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch {}
+        document.body.removeChild(ta);
+        const prev = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        setTimeout(() => { btn.textContent = prev; }, 1200);
       }
     });
   });
 }
 
-function render() {
-  const items = applyFilters();
-  els.resultsMeta.textContent = `${items.length} video${items.length === 1 ? '' : 's'}`;
-  els.modeMeta.textContent = currentMode === 'feed' ? 'Feed mode' : 'Grid mode';
-
-  if (!items.length) {
-    els.resultsShell.innerHTML = `
-      <div class="empty">
-        <div>
-          <h2 style="margin:0 0 10px 0;color:var(--text);">No results found</h2>
-          <p style="margin:0;">Try changing the search, filters, or feed mode.</p>
-        </div>
-      </div>
-    `;
-    setupPlayback();
-    setupCopyButtons();
-    return;
-  }
-
-  els.resultsShell.innerHTML = items.map((item, idx) => buildCard(item, idx, els.searchInput.value.trim())).join('');
-  setupPlayback();
-  setupCopyButtons();
+// ─── HASHTAG BUTTONS ──────────────────────────────────────────────────────────
+function setupHashtagButtons() {
+  document.querySelectorAll('.chip.cyan[data-hashtag]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      handleHashtagClick(btn.getAttribute('data-hashtag'));
+    });
+  });
 }
 
-async function loadData() {
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+async function loadData(forceRefresh = false) {
   els.loadingState.classList.remove('hidden');
   els.resultsShell.classList.add('hidden');
+  els.paginationShell.classList.add('hidden');
   els.errorBanner.classList.add('hidden');
+  els.cacheMeta.classList.add('hidden');
+
+  const fetchOpts = forceRefresh ? { cache: 'no-store' } : {};
 
   try {
-    const response = await fetch(DATA_URL, { cache: 'no-store' });
+    const response = await fetch(DATA_URL, fetchOpts);
     if (!response.ok) throw new Error(`HTTP ${response.status} — archive not found`);
     const data = await response.json();
     if (!Array.isArray(data)) throw new Error('search_index.json is not an array');
@@ -1145,58 +1572,124 @@ async function loadData() {
     allItems = data;
     await saveIndexCache(data);
     els.offlineBanner.classList.add('hidden');
+    setOnlineStatus(true);
   } catch (err) {
     const cached = await loadCachedIndex();
     if (cached.length) {
       allItems = cached;
       els.offlineBanner.classList.remove('hidden');
-      els.cacheMeta.textContent = 'Cache used';
+      els.cacheMeta.classList.remove('hidden');
+      els.cacheMeta.textContent = 'Showing cached data';
     } else {
       els.errorBanner.classList.remove('hidden');
-      els.errorBox.innerHTML = `<strong>Could not load archive</strong><br>${escHtml(err.message)}<br><br>Make sure <code>archive/search/search_index.json</code> exists in the repo and GitHub Pages is serving the site from the repository root.`;
+      els.errorBox.innerHTML =
+        `<strong>Could not load archive</strong><br>${escHtml(err.message)}<br><br>` +
+        `Make sure <code>archive/search/search_index.json</code> exists and GitHub Pages is active.`;
       els.loadingState.classList.add('hidden');
       return;
     }
   }
 
   populateAuthors();
+  restoreState(); // Restore URL hash state after authors are populated
   render();
   els.loadingState.classList.add('hidden');
   els.resultsShell.classList.remove('hidden');
 }
 
-function wireEvents() {
-  const rerender = () => render();
+// ─── ONLINE / OFFLINE STATUS ─────────────────────────────────────────────────
+function setOnlineStatus(isOnline) {
+  els.onlineMeta.classList.toggle('hidden', !isOnline);
+  els.offlineMeta.classList.toggle('hidden', isOnline);
+  // Auto-hide 'Online' badge after 3s
+  if (isOnline) setTimeout(() => els.onlineMeta.classList.add('hidden'), 3000);
+}
 
-  els.searchInput.addEventListener('input', rerender);
-  els.authorFilter.addEventListener('change', rerender);
-  els.sortSelect.addEventListener('change', rerender);
-  els.dateFilter.addEventListener('change', rerender);
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker?.addEventListener('statechange', () => {
+        if (newWorker.statechange === 'installed' && navigator.serviceWorker.controller) {
+          waitingWorker = newWorker;
+          els.updateToast.classList.add('visible');
+        }
+      });
+    });
+  }).catch(() => {});
+}
+
+// ─── WIRE EVENTS ─────────────────────────────────────────────────────────────
+function wireEvents() {
+  // Debounced search
+  const debouncedRender = debounce(() => { currentPage = 1; render(); }, 220);
+
+  els.searchInput.addEventListener('input', () => {
+    updateSearchClearBtn();
+    debouncedRender();
+  });
+
+  els.searchClear.addEventListener('click', () => {
+    els.searchInput.value = '';
+    els.searchInput.focus();
+    updateSearchClearBtn();
+    currentPage = 1;
+    render();
+  });
+
+  els.authorFilter.addEventListener('change', () => { currentPage = 1; render(); });
+  els.sortSelect.addEventListener('change', ()   => { currentPage = 1; render(); });
+  els.dateFilter.addEventListener('change', ()   => { currentPage = 1; render(); });
 
   els.gridModeBtn.addEventListener('click', () => setMode('grid'));
   els.feedModeBtn.addEventListener('click', () => setMode('feed'));
-  els.refreshBtn.addEventListener('click', () => loadData());
+  els.refreshBtn.addEventListener('click',  () => loadData(true));
+
+  els.clearFiltersBtn.addEventListener('click', clearAllFilters);
+
+  els.offlineDismiss.addEventListener('click', () => {
+    els.offlineBanner.classList.add('hidden');
+  });
+
+  els.updateBtn.addEventListener('click', () => {
+    if (waitingWorker) {
+      waitingWorker.postMessage('SKIP_WAITING');
+      waitingWorker = null;
+    }
+    location.reload();
+  });
 
   window.addEventListener('online', () => {
     els.offlineBanner.classList.add('hidden');
-    els.cacheMeta.textContent = 'Online';
+    els.cacheMeta.classList.add('hidden');
+    setOnlineStatus(true);
   });
 
   window.addEventListener('offline', () => {
     els.offlineBanner.classList.remove('hidden');
-    els.cacheMeta.textContent = 'Offline';
+    setOnlineStatus(false);
+  });
+
+  // Keyboard shortcut: / to focus search
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== els.searchInput) {
+      e.preventDefault();
+      els.searchInput.focus();
+      els.searchInput.select();
+    }
+    if (e.key === 'Escape' && document.activeElement === els.searchInput) {
+      els.searchInput.blur();
+    }
   });
 }
 
-function registerServiceWorker() {
-  if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
-
-setMode(currentMode);
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+setMode(currentMode, true); // Apply mode classes without rendering (no data yet)
 wireEvents();
 registerServiceWorker();
-loadData();
+loadData(false);
 </script>
 </body>
 </html>
