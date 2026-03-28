@@ -14,7 +14,7 @@
     "provider": "mega",
     "remote_name": "mega",
     "remote_root": "tiktok-archive",
-    "generate_public_links": false
+    "generate_public_links": true
   },
   "sync": {
     "parallel_workers": 3,
