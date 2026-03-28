@@ -3,7 +3,7 @@ import os
 import threading
 from datetime import datetime
 
-LOG_FILE = "archive/system/log.json"
+LOG_FILE = "archive/private/log.json"
 _lock = threading.Lock()
 
 
