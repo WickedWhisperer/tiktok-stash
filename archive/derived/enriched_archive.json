@@ -173,7 +173,7 @@
     "remote_metadata_size": 10462,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:10:09.720149"
+    "last_checked_at": "2026-03-28T05:11:29.520438"
   },
   {
     "id": "7620164000902417666",
@@ -350,7 +350,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:10:09.719264"
+    "last_checked_at": "2026-03-28T05:11:29.519731"
   },
   {
     "id": "7619757123131559190",
@@ -527,7 +527,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:10:09.719541"
+    "last_checked_at": "2026-03-28T05:11:29.520189"
   },
   {
     "id": "7619389482399255830",
@@ -685,7 +685,7 @@
     "remote_metadata_size": 6453,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:10:12.431681"
+    "last_checked_at": "2026-03-28T05:11:32.645012"
   },
   {
     "id": "7618315955151605014",
@@ -843,6 +843,6 @@
     "remote_metadata_size": 6463,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:10:12.439682"
+    "last_checked_at": "2026-03-28T05:11:33.339664"
   }
 ]
