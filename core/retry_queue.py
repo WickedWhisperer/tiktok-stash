@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-RETRY_FILE = "archive/system/retry_queue.json"
+RETRY_FILE = "archive/private/retry_queue.json"
 
 
 def load_queue():
