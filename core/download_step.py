@@ -23,7 +23,7 @@ def load_settings():
             "provider": "mega",
             "remote_name": "mega",
             "remote_root": "tiktok-archive",
-            "generate_public_links": False,
+            "generate_public_links": True,
         },
         "sync": {
             "parallel_workers": 3,
