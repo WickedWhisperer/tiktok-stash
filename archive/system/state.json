@@ -1,18 +1,18 @@
 {
   "7620870073321868566": {
     "download_status": "completed",
-    "upload_status": "failed",
+    "upload_status": "completed",
     "video_storage_url": "flamrzz/7620870073321868566/video.mp4",
     "is_available": true,
-    "last_updated": "2026-03-27T19:01:34.964384",
-    "verification_status": "failed",
+    "last_updated": "2026-03-28T05:07:00.121879",
+    "verification_status": "verified",
     "public_link_status": "disabled",
     "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
     "metadata_storage_path": "flamrzz/7620870073321868566/metadata.json",
     "remote_video_size": 1528479,
-    "remote_metadata_size": 9760,
-    "last_error": "name 'os' is not defined",
-    "last_checked_at": "2026-03-27T19:01:31.187755",
+    "remote_metadata_size": 10462,
+    "last_error": null,
+    "last_checked_at": "2026-03-28T05:06:54.970769",
     "public_link_url": null,
     "local_video_size": 1528479,
     "local_video_sha256": "b1af19feab3ebabe73b2be4d8127bcc860838288d2874fb8acb045087ccd3dcc"
@@ -22,7 +22,7 @@
     "upload_status": "completed",
     "video_storage_url": "tiktok-archive/flamrzz/7620164000902417666/video.mp4",
     "is_available": true,
-    "last_updated": "2026-03-27T19:01:35.855573",
+    "last_updated": "2026-03-28T05:06:57.429189",
     "verification_status": "verified",
     "public_link_status": "disabled",
     "video_storage_path": "flamrzz/7620164000902417666/video.mp4",
@@ -30,7 +30,7 @@
     "remote_video_size": 1718928,
     "remote_metadata_size": 8748,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:31.186482",
+    "last_checked_at": "2026-03-28T05:06:54.971039",
     "public_link_url": null
   },
   "7619757123131559190": {
@@ -38,7 +38,7 @@
     "upload_status": "completed",
     "video_storage_url": "tiktok-archive/flamrzz/7619757123131559190/video.mp4",
     "is_available": true,
-    "last_updated": "2026-03-27T19:01:33.954054",
+    "last_updated": "2026-03-28T05:06:58.263975",
     "verification_status": "verified",
     "public_link_status": "disabled",
     "video_storage_path": "flamrzz/7619757123131559190/video.mp4",
@@ -46,7 +46,7 @@
     "remote_video_size": 1429489,
     "remote_metadata_size": 8748,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:31.187395",
+    "last_checked_at": "2026-03-28T05:06:54.971143",
     "public_link_url": null
   },
   "7619389482399255830": {
@@ -54,7 +54,7 @@
     "upload_status": "completed",
     "video_storage_url": "tiktok-archive/flamrzz/7619389482399255830/video.mp4",
     "is_available": true,
-    "last_updated": "2026-03-27T19:01:37.311150",
+    "last_updated": "2026-03-28T05:06:59.901157",
     "verification_status": "verified",
     "public_link_status": "disabled",
     "video_storage_path": "flamrzz/7619389482399255830/video.mp4",
@@ -62,7 +62,7 @@
     "remote_video_size": 2119960,
     "remote_metadata_size": 6453,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:33.953773",
+    "last_checked_at": "2026-03-28T05:06:57.429021",
     "public_link_url": null
   },
   "7618315955151605014": {
@@ -70,7 +70,7 @@
     "upload_status": "completed",
     "video_storage_url": "tiktok-archive/flamrzz/7618315955151605014/video.mp4",
     "is_available": true,
-    "last_updated": "2026-03-27T19:01:37.949481",
+    "last_updated": "2026-03-28T05:07:00.566497",
     "verification_status": "verified",
     "public_link_status": "disabled",
     "video_storage_path": "flamrzz/7618315955151605014/video.mp4",
@@ -78,7 +78,7 @@
     "remote_video_size": 2757734,
     "remote_metadata_size": 6463,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:34.964473",
+    "last_checked_at": "2026-03-28T05:06:58.263878",
     "public_link_url": null
   }
 }

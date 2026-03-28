@@ -162,11 +162,18 @@
       "commentsDatasetUrl": null
     },
     "download_status": "completed",
-    "upload_status": "failed",
-    "verification_status": "failed",
+    "upload_status": "completed",
+    "verification_status": "verified",
+    "public_link_status": "disabled",
+    "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
+    "metadata_storage_path": "flamrzz/7620870073321868566/metadata.json",
+    "video_storage_url": "flamrzz/7620870073321868566/video.mp4",
+    "public_link_url": null,
+    "remote_video_size": 1528479,
+    "remote_metadata_size": 10462,
     "is_available": true,
-    "last_error": "name 'os' is not defined",
-    "last_checked_at": "2026-03-27T19:01:31.187755",
+    "last_error": null,
+    "last_checked_at": "2026-03-28T05:06:54.970769",
     "local_video_size": 1528479,
     "local_video_sha256": "b1af19feab3ebabe73b2be4d8127bcc860838288d2874fb8acb045087ccd3dcc"
   },
@@ -345,7 +352,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:31.186482"
+    "last_checked_at": "2026-03-28T05:06:54.971039"
   },
   {
     "id": "7619757123131559190",
@@ -522,7 +529,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:31.187395"
+    "last_checked_at": "2026-03-28T05:06:54.971143"
   },
   {
     "id": "7619389482399255830",
@@ -680,7 +687,7 @@
     "remote_metadata_size": 6453,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:33.953773"
+    "last_checked_at": "2026-03-28T05:06:57.429021"
   },
   {
     "id": "7618315955151605014",
@@ -838,6 +845,6 @@
     "remote_metadata_size": 6463,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-27T19:01:34.964473"
+    "last_checked_at": "2026-03-28T05:06:58.263878"
   }
 ]
