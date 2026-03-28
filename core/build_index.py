@@ -14,14 +14,26 @@ def normalize_list(value):
         return []
 
     if isinstance(value, str):
-        return [value.strip()] if value.strip() else []
+        value = value.strip()
+        return [value] if value else []
+
+    if isinstance(value, dict):
+        candidate = (
+            value.get("name")
+            or value.get("title")
+            or value.get("text")
+            or value.get("username")
+            or value.get("id")
+        )
+        return [str(candidate)] if candidate else []
 
     if isinstance(value, list):
         out = []
         for v in value:
             if isinstance(v, str):
-                if v.strip():
-                    out.append(v.strip())
+                v = v.strip()
+                if v:
+                    out.append(v)
             elif isinstance(v, dict):
                 candidate = (
                     v.get("name")
@@ -33,17 +45,6 @@ def normalize_list(value):
                 if candidate:
                     out.append(str(candidate))
         return out
-
-    if isinstance(value, dict):
-        candidate = (
-            value.get("name")
-            or value.get("title")
-            or value.get("text")
-            or value.get("username")
-            or value.get("id")
-        )
-        if candidate:
-            return [str(candidate)]
 
     return []
 
@@ -74,10 +75,16 @@ def build_index():
     index = []
 
     for item in data:
+        if not isinstance(item, dict):
+            continue
+
+        video_id = str(item.get("id") or "").strip()
+        if not video_id:
+            continue
+
         stats = item.get("stats", {}) or {}
         music = item.get("music", {}) or {}
         video = item.get("video", {}) or {}
-        video_id = item.get("id")
         state_item = state.get(video_id, {}) or {}
 
         hashtags = normalize_list(item.get("hashtags"))
@@ -97,7 +104,7 @@ def build_index():
             " ".join(hashtags),
             " ".join(mentions),
             " ".join(
-                str(m.get("username") or m.get("userUniqueId") or "")
+                str(m.get("username") or m.get("userUniqueId") or m.get("unique_id") or "")
                 for m in detailed_mentions
                 if isinstance(m, dict)
             ),
@@ -134,10 +141,10 @@ def build_index():
             "remote_video_size": state_item.get("remote_video_size") or item.get("remote_video_size"),
             "remote_metadata_size": state_item.get("remote_metadata_size") or item.get("remote_metadata_size"),
 
-            "likes": stats.get("likes", 0),
-            "views": stats.get("views", 0),
-            "comments": stats.get("comments", 0),
-            "shares": stats.get("shares", 0),
+            "likes": stats.get("likes", stats.get("diggCount", 0)),
+            "views": stats.get("views", stats.get("playCount", 0)),
+            "comments": stats.get("comments", stats.get("commentCount", 0)),
+            "shares": stats.get("shares", stats.get("shareCount", 0)),
             "favorites": stats.get("favorites", stats.get("collectCount", 0)),
             "reposts": stats.get("reposts", stats.get("repostCount", 0)),
 
