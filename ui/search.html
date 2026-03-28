@@ -599,7 +599,7 @@
             <span class="badge" id="cacheMeta">Cache inactive</span>
           </div>
           <div class="status">
-            <span class="badge good" id="publicLinkMeta">Public links ready</span>
+            <span class="badge good" id="publicLinkMeta">Public links enabled</span>
           </div>
         </div>
       </div>
@@ -634,7 +634,7 @@
 
 <script>
 const DATA_URL = '../archive/search/search_index.json';
-const CACHE_KEY = 'tiktok-stash-search-cache-v4';
+const CACHE_NAME = 'tiktok-stash-ui-v2';
 const MODE_KEY = 'tiktok-stash-ui-mode-v2';
 
 let allItems = [];
@@ -754,48 +754,47 @@ function getStat(item, key) {
   return 0;
 }
 
+function isHttpUrl(value) {
+  return typeof value === 'string' && /^https?:\/\//i.test(value);
+}
+
 function getPlaybackUrl(item) {
-  const url = item?.video_storage_url || item?.public_link_url || item?.url || '';
-  return typeof url === 'string' ? url : '';
+  if (isHttpUrl(item?.public_link_url)) return item.public_link_url;
+  if (isHttpUrl(item?.video_storage_url)) return item.video_storage_url;
+  return '';
 }
 
-function getPosterUrl(item) {
-  return item?.video_cover_url || item?.music_cover || '';
+function getOpenUrl(item) {
+  return getPlaybackUrl(item) || item?.url || '#';
 }
 
-function getAvatarUrl(item) {
-  return item?.author_avatar || '';
+function getStorageLabel(item) {
+  return item?.video_storage_path || item?.metadata_storage_path || '';
 }
 
-function getMusicUrl(item) {
-  return item?.music_url || '';
-}
-
-function getAuthorUrl(item) {
-  const author = item?.author || '';
-  if (item?.author_profile) return item.author_profile;
-  return author ? `https://www.tiktok.com/@${encodeURIComponent(author)}` : '#';
-}
-
-function getMentionUrl(mention) {
-  const clean = String(mention || '').replace(/^@/, '').trim();
-  return clean ? `https://www.tiktok.com/@${encodeURIComponent(clean)}` : '#';
-}
-
-function loadCachedIndex() {
+async function loadCachedIndex() {
+  if (!('caches' in window)) return [];
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(DATA_URL);
+    if (!cached) return [];
+    const data = await cached.json();
+    return Array.isArray(data) ? data : [];
   } catch {
     return [];
   }
 }
 
-function saveCachedIndex(items) {
+async function saveIndexCache(items) {
+  if (!('caches' in window)) return;
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(items));
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(
+      DATA_URL,
+      new Response(JSON.stringify(items), {
+        headers: { 'Content-Type': 'application/json' }
+      })
+    );
     els.cacheMeta.textContent = 'Cache updated';
   } catch {
     els.cacheMeta.textContent = 'Cache limited';
@@ -824,4 +823,380 @@ function setMode(mode) {
 function populateAuthors() {
   const authors = [...new Set(allItems.map(item => item.author).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   const selected = els.authorFilter.value;
-  els.authorFilter.innerHTML = '<option value="">All author
+  els.authorFilter.innerHTML = '<option value="">All authors</option>';
+  authors.forEach(author => {
+    const opt = document.createElement('option');
+    opt.value = author;
+    opt.textContent = '@' + author;
+    els.authorFilter.appendChild(opt);
+  });
+  els.authorFilter.value = selected;
+}
+
+function applyFilters() {
+  const query = els.searchInput.value.trim().toLowerCase();
+  const author = els.authorFilter.value;
+  const sort = els.sortSelect.value;
+  const days = parseInt(els.dateFilter.value, 10) || 0;
+
+  let items = [...allItems];
+
+  if (query) {
+    items = items.filter(item => (item.search_text || '').includes(query));
+  }
+
+  if (author) {
+    items = items.filter(item => item.author === author);
+  }
+
+  if (days) {
+    const cutoff = Date.now() - (days * 86400000);
+    items = items.filter(item => {
+      if (!item.created_at) return false;
+      const ts = new Date(item.created_at).getTime();
+      return Number.isFinite(ts) && ts >= cutoff;
+    });
+  }
+
+  items.sort((a, b) => {
+    if (sort === 'date_desc') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    if (sort === 'date_asc') return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    return getStat(b, sort) - getStat(a, sort);
+  });
+
+  filteredItems = items;
+  return items;
+}
+
+function videoStatusPills(item) {
+  const pills = [];
+  const download = item.download_status || 'unknown';
+  const upload = item.upload_status || 'unknown';
+  const verify = item.verification_status || 'unknown';
+  const pub = item.public_link_status || 'unknown';
+
+  pills.push(`<span class="status-pill ${download === 'completed' ? 'good' : download === 'failed' ? 'warn' : ''}">Download: ${escHtml(download)}</span>`);
+  pills.push(`<span class="status-pill ${upload === 'completed' ? 'good' : upload === 'failed' ? 'warn' : ''}">Upload: ${escHtml(upload)}</span>`);
+  pills.push(`<span class="status-pill ${verify === 'verified' ? 'good' : verify === 'failed' ? 'warn' : ''}">Verify: ${escHtml(verify)}</span>`);
+  pills.push(`<span class="status-pill ${pub === 'created' ? 'good' : pub === 'failed' ? 'warn' : ''}">Link: ${escHtml(pub)}</span>`);
+  if (item.is_available === false) {
+    pills.push(`<span class="status-pill warn">Unavailable</span>`);
+  }
+  return pills.join('');
+}
+
+function buildCard(item, idx, query) {
+  const playback = getPlaybackUrl(item);
+  const openUrl = getOpenUrl(item);
+  const poster = item.video_cover_url || item.music_cover || '';
+  const feedClass = currentMode === 'feed' ? 'feed-mode' : '';
+  const avatarUrl = item.author_avatar || '';
+  const authorUrl = item.author_profile || `https://www.tiktok.com/@${encodeURIComponent(item.author || 'unknown')}`;
+  const musicUrl = item.music_url || '';
+  const tiktokUrl = item.url || '#';
+
+  const hashtags = normalizeList(item.hashtags);
+  const mentions = normalizeList(item.mentions);
+  const detailedMentions = Array.isArray(item.detailed_mentions) ? item.detailed_mentions : [];
+
+  const musicTitle = item.music_name || '';
+  const musicAuthor = item.music_author || '';
+  const dateText = formatDate(item.created_at);
+  const caption = item.caption || '';
+
+  const stats = [
+    ['likes', getStat(item, 'likes')],
+    ['views', getStat(item, 'views')],
+    ['comments', getStat(item, 'comments')],
+    ['shares', getStat(item, 'shares')],
+    ['favorites', getStat(item, 'favorites')],
+    ['reposts', getStat(item, 'reposts')]
+  ];
+
+  const storageLabel = getStorageLabel(item);
+  const storageChip = storageLabel
+    ? `<span class="chip">Storage: ${escHtml(storageLabel)}</span>`
+    : '';
+
+  const mentionLinks = mentions.map(m => {
+    const clean = String(m).replace(/^@/, '').trim();
+    if (!clean) return '';
+    return `<a class="chip pink" href="https://www.tiktok.com/@${encodeURIComponent(clean)}" target="_blank" rel="noopener">@${escHtml(clean)}</a>`;
+  }).join('');
+
+  const detailedMentionLinks = detailedMentions
+    .map(m => {
+      if (!m || typeof m !== 'object') return '';
+      const user = m.username || m.userUniqueId || m.unique_id || m.name || '';
+      const clean = String(user).replace(/^@/, '').trim();
+      return clean
+        ? `<a class="chip" href="https://www.tiktok.com/@${encodeURIComponent(clean)}" target="_blank" rel="noopener">@${escHtml(clean)}</a>`
+        : '';
+    })
+    .filter(Boolean)
+    .join('');
+
+  const hashtagChips = hashtags.map(h => `<span class="chip cyan">#${escHtml(String(h).replace(/^#/, ''))}</span>`).join('');
+
+  return `
+    <article class="card ${feedClass}" data-id="${escAttr(item.id || idx)}">
+      <div class="media">
+        <div class="poster" data-poster="${escAttr(poster)}" ${poster ? `style="background-image:url('${escAttr(poster)}')"` : ''}></div>
+        <video
+          class="player archive-video"
+          muted
+          playsinline
+          loop
+          controls
+          preload="metadata"
+          poster="${escAttr(poster)}"
+          data-src="${escAttr(playback)}"
+          data-index="${idx}"
+          data-id="${escAttr(item.id || idx)}"
+        ></video>
+
+        <div class="overlay">
+          <div class="overlay-top">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <div class="avatar">
+                ${avatarUrl ? `<img src="${escAttr(avatarUrl)}" alt="${escAttr(item.author || 'author')}" loading="lazy">` : escHtml(initials(item.author))}
+              </div>
+              <div class="handle">
+                <a href="${escAttr(authorUrl)}" target="_blank" rel="noopener">@${escHtml(item.author || 'unknown')}</a>
+                <div class="date">${escHtml(dateText)}</div>
+              </div>
+            </div>
+            <div class="play-state">${currentMode === 'feed' ? 'Feed autoplay' : 'Grid preview'}</div>
+          </div>
+
+          <div class="overlay-bottom">
+            <div class="status-line">
+              ${videoStatusPills(item)}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+              ${musicUrl ? `<a class="btn" href="${escAttr(musicUrl)}" target="_blank" rel="noopener">Music</a>` : ''}
+              ${playback ? `<a class="btn primary" href="${escAttr(openUrl)}" target="_blank" rel="noopener">Open video</a>` : `<a class="btn primary" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">Open TikTok</a>`}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="caption">${highlight(caption, query)}</div>
+
+        <div class="chips">
+          ${hashtagChips}
+          ${mentionLinks}
+          ${detailedMentionLinks}
+          ${musicTitle ? `<a class="chip" href="${escAttr(musicUrl || tiktokUrl)}" target="_blank" rel="noopener">🎵 ${highlight(musicTitle, query)}${musicAuthor ? ' · ' + escHtml(musicAuthor) : ''}</a>` : ''}
+          ${storageChip}
+        </div>
+
+        <div class="stats">
+          ${stats.map(([name, value]) => `<span class="stat">${escHtml(name)}: ${fmt(value)}</span>`).join('')}
+        </div>
+
+        <div class="actions">
+          ${playback ? `<button class="btn pink copy-link-btn" type="button" data-copy="${escAttr(playback)}">Copy public link</button>` : ''}
+          ${storageLabel ? `<button class="btn" type="button" data-copy="${escAttr(storageLabel)}">Copy storage path</button>` : ''}
+          <a class="btn" href="${escAttr(tiktokUrl)}" target="_blank" rel="noopener">Open TikTok</a>
+          ${item.public_link_url ? `<a class="btn" href="${escAttr(item.public_link_url)}" target="_blank" rel="noopener">Public link</a>` : ''}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function cleanupVideos() {
+  document.querySelectorAll('.archive-video').forEach(video => {
+    try {
+      video.pause();
+    } catch {}
+  });
+}
+
+function setupPlayback() {
+  if (activeObserver) {
+    activeObserver.disconnect();
+    activeObserver = null;
+  }
+
+  const videos = [...document.querySelectorAll('.archive-video')];
+  if (!videos.length) return;
+
+  activeObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const video = entry.target;
+      const src = video.getAttribute('data-src');
+      const poster = video.getAttribute('poster') || '';
+      const posterEl = video.closest('.card')?.querySelector('.poster');
+
+      if (entry.isIntersecting && src && !video.getAttribute('src')) {
+        video.src = src;
+        video.load();
+      }
+
+      if (currentMode === 'feed') {
+        if (entry.intersectionRatio >= 0.65 && src) {
+          if (activePlayingVideo && activePlayingVideo !== video) {
+            try { activePlayingVideo.pause(); } catch {}
+          }
+          activePlayingVideo = video;
+          try {
+            video.muted = true;
+            video.playsInline = true;
+            const p = video.play();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+          } catch {}
+        } else if (entry.intersectionRatio < 0.35) {
+          try { video.pause(); } catch {}
+        }
+      }
+
+      if (posterEl && poster) {
+        posterEl.style.opacity = entry.isIntersecting ? '0.18' : '0.82';
+      }
+    });
+  }, {
+    root: null,
+    threshold: [0.1, 0.35, 0.65, 0.8],
+    rootMargin: '450px 0px'
+  });
+
+  videos.forEach(video => {
+    video.addEventListener('error', () => {
+      const card = video.closest('.card');
+      if (card) {
+        const poster = card.querySelector('.poster');
+        if (poster) poster.style.opacity = '1';
+        video.style.display = 'none';
+      }
+    });
+    activeObserver.observe(video);
+  });
+
+  if (currentMode === 'feed') {
+    const firstVideo = document.querySelector('.archive-video');
+    if (firstVideo) {
+      setTimeout(() => {
+        try {
+          firstVideo.play().catch(() => {});
+        } catch {}
+      }, 250);
+    }
+  } else {
+    cleanupVideos();
+  }
+}
+
+function setupCopyButtons() {
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const value = btn.getAttribute('data-copy');
+      if (!value) return;
+
+      try {
+        await navigator.clipboard.writeText(value);
+        const prev = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = prev; }, 900);
+      } catch {
+        alert('Copy failed');
+      }
+    });
+  });
+}
+
+function render() {
+  const items = applyFilters();
+  els.resultsMeta.textContent = `${items.length} video${items.length === 1 ? '' : 's'}`;
+  els.modeMeta.textContent = currentMode === 'feed' ? 'Feed mode' : 'Grid mode';
+
+  if (!items.length) {
+    els.resultsShell.innerHTML = `
+      <div class="empty">
+        <div>
+          <h2 style="margin:0 0 10px 0;color:var(--text);">No results found</h2>
+          <p style="margin:0;">Try changing the search, filters, or feed mode.</p>
+        </div>
+      </div>
+    `;
+    setupPlayback();
+    setupCopyButtons();
+    return;
+  }
+
+  els.resultsShell.innerHTML = items.map((item, idx) => buildCard(item, idx, els.searchInput.value.trim())).join('');
+  setupPlayback();
+  setupCopyButtons();
+}
+
+async function loadData() {
+  els.loadingState.classList.remove('hidden');
+  els.resultsShell.classList.add('hidden');
+  els.errorBanner.classList.add('hidden');
+
+  try {
+    const response = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status} — archive not found`);
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('search_index.json is not an array');
+
+    allItems = data;
+    await saveIndexCache(data);
+    els.offlineBanner.classList.add('hidden');
+  } catch (err) {
+    const cached = await loadCachedIndex();
+    if (cached.length) {
+      allItems = cached;
+      els.offlineBanner.classList.remove('hidden');
+      els.cacheMeta.textContent = 'Cache used';
+    } else {
+      els.errorBanner.classList.remove('hidden');
+      els.errorBox.innerHTML = `<strong>Could not load archive</strong><br>${escHtml(err.message)}<br><br>Make sure <code>archive/search/search_index.json</code> exists in the repo and GitHub Pages is serving the site from the repository root.`;
+      els.loadingState.classList.add('hidden');
+      return;
+    }
+  }
+
+  populateAuthors();
+  render();
+  els.loadingState.classList.add('hidden');
+  els.resultsShell.classList.remove('hidden');
+}
+
+function wireEvents() {
+  const rerender = () => render();
+
+  els.searchInput.addEventListener('input', rerender);
+  els.authorFilter.addEventListener('change', rerender);
+  els.sortSelect.addEventListener('change', rerender);
+  els.dateFilter.addEventListener('change', rerender);
+
+  els.gridModeBtn.addEventListener('click', () => setMode('grid'));
+  els.feedModeBtn.addEventListener('click', () => setMode('feed'));
+  els.refreshBtn.addEventListener('click', () => loadData());
+
+  window.addEventListener('online', () => {
+    els.offlineBanner.classList.add('hidden');
+    els.cacheMeta.textContent = 'Online';
+  });
+
+  window.addEventListener('offline', () => {
+    els.offlineBanner.classList.remove('hidden');
+    els.cacheMeta.textContent = 'Offline';
+  });
+}
+
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+setMode(currentMode);
+wireEvents();
+registerServiceWorker();
+loadData();
+</script>
+</body>
+</html>
