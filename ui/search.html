@@ -5,720 +5,823 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TikTok Stash</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --card: #161616;
-  --border: #222222;
-  --pink: #ff2d55;
-  --cyan: #00f2ea;
-  --text: #f0f0f0;
-  --muted: #666;
-  --dim: #333;
-}
+  :root {
+    --bg: #090909;
+    --surface: #111111;
+    --surface-2: #151515;
+    --card: #161616;
+    --border: #242424;
+    --border-2: #2e2e2e;
+    --pink: #ff2d55;
+    --cyan: #00f2ea;
+    --text: #f3f3f3;
+    --muted: #8b8b8b;
+    --soft: #b7b7b7;
+    --good: #39d98a;
+    --warn: #ffcc00;
+  }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background:
+      radial-gradient(circle at top, rgba(0,242,234,0.08), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(255,45,85,0.08), transparent 24%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.55;
+    z-index: 0;
+  }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.6;
-}
+  .app {
+    position: relative;
+    z-index: 1;
+  }
 
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 24px;
-}
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(16px);
+    background: rgba(9,9,9,0.88);
+    border-bottom: 1px solid var(--border);
+  }
 
-.header-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
+  .header-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px 18px;
+    display: grid;
+    gap: 14px;
+  }
 
-.logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--pink));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  flex-shrink: 0;
-  user-select: none;
-}
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
 
-.logo span {
-  color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 1px;
-  -webkit-text-fill-color: var(--muted);
-  display: block;
-  margin-top: -4px;
-  text-transform: uppercase;
-}
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    user-select: none;
+  }
 
-.search-bar {
-  flex: 1;
-  min-width: 200px;
-  position: relative;
-}
+  .brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 2.4px;
+    line-height: 1;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-.search-bar input {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 16px 10px 40px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
+  .brand-subtitle {
+    font-size: 11px;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-.search-bar input:focus { border-color: var(--pink); }
-.search-bar input::placeholder { color: var(--muted); }
+  .search-wrap {
+    flex: 1;
+    min-width: min(100%, 260px);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
 
-.search-bar svg {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.4;
-  pointer-events: none;
-}
+  .search {
+    position: relative;
+  }
 
-.controls {
-  max-width: 1100px;
-  margin: 20px auto;
-  padding: 0 24px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-}
+  .search input {
+    width: 100%;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px 14px 44px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+  }
 
-select {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 28px 8px 14px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-}
+  .search input:focus {
+    border-color: rgba(0,242,234,0.7);
+    box-shadow: 0 0 0 4px rgba(0,242,234,0.08);
+  }
 
-select:focus { border-color: var(--cyan); }
+  .search svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: .5;
+    pointer-events: none;
+  }
 
-.results-meta {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
+  .toolbar {
+    display: grid;
+    gap: 10px;
+  }
 
-.results-meta strong {
-  color: var(--cyan);
-  font-size: 14px;
-}
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
 
-.grid {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  position: relative;
-  z-index: 1;
-}
+  select, .toggle, .mini-btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .18s, background .18s, transform .18s;
+  }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: border-color 0.2s, transform 0.2s;
-  animation: fadeUp 0.3s ease both;
-  position: relative;
-}
+  select:focus, .toggle:focus, .mini-btn:focus {
+    border-color: rgba(0,242,234,0.7);
+  }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--pink), var(--cyan));
-  opacity: 0;
-  transition: opacity 0.2s;
-  z-index: 2;
-}
+  .toggle.active, .mini-btn.active {
+    background: rgba(0,242,234,0.1);
+    border-color: rgba(0,242,234,0.42);
+  }
 
-.card:hover { border-color: #333; transform: translateY(-2px); }
-.card:hover::before { opacity: 1; }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
 
-.card-thumb {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  background: #1a1a1a;
-  display: block;
-}
+  .badge {
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
 
-.card-thumb-placeholder {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: linear-gradient(135deg, #1a1a1a, #222);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: var(--dim);
-}
+  .badge.good { color: var(--good); }
+  .badge.warn { color: var(--warn); }
+  .badge.cyan { color: var(--cyan); }
 
-.card-body {
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-}
+  .results {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 18px;
+  }
 
-.card-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+  .loading, .empty, .error {
+    min-height: 48vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--muted);
+  }
 
-.avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  background: #222;
-}
+  .skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
 
-.avatar-initials {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink), var(--cyan));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: #000;
-  flex-shrink: 0;
-}
+  .skeleton {
+    height: 430px;
+    border-radius: 22px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    background-size: 300% 100%;
+    animation: shimmer 1.2s infinite;
+    border: 1px solid var(--border);
+  }
 
-.author-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  @keyframes shimmer {
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 0; }
+  }
 
-.author-name a { color: inherit; text-decoration: none; }
-.author-name a:hover { color: var(--cyan); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
 
-.card-date {
-  font-size: 11px;
-  color: var(--muted);
-  flex-shrink: 0;
-}
+  .feed {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    max-width: 980px;
+    margin: 0 auto;
+  }
 
-.card-caption {
-  font-size: 13px;
-  color: #ccc;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  .card {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.28);
+    transition: transform .18s, border-color .18s;
+  }
 
-.card-caption .hashtag { color: var(--cyan); font-weight: 500; }
-.card-caption .mention { color: var(--pink); font-weight: 500; }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-2);
+  }
 
-.music-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--dim);
-  border-radius: 8px;
-  padding: 7px 10px;
-}
+  .card.feed-mode {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 78vh;
+    scroll-snap-align: start;
+  }
 
-.music-cover {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1px solid var(--dim);
-  background: #222;
-  animation: spin-slow 6s linear infinite;
-}
+  .media {
+    position: relative;
+    background: #000;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+  }
 
-@keyframes spin-slow { to { transform: rotate(360deg); } }
+  .feed-mode .media {
+    aspect-ratio: 9 / 16;
+    max-height: 82vh;
+  }
 
-.music-cover-placeholder {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  flex-shrink: 0;
-}
+  .player {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    background: #000;
+  }
 
-.music-text { min-width: 0; flex: 1; }
+  .poster {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: saturate(1.05);
+    opacity: .82;
+  }
 
-.music-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .poster::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.38));
+  }
 
-.music-title a { color: inherit; text-decoration: none; }
-.music-title a:hover { color: var(--cyan); }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px;
+    pointer-events: none;
+  }
 
-.music-artist {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .overlay-top,
+  .overlay-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    pointer-events: auto;
+  }
 
-.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--pink), var(--cyan));
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+  }
 
-.chip {
-  font-size: 11px;
-  border: 1px solid var(--dim);
-  border-radius: 999px;
-  padding: 3px 8px;
-  color: var(--cyan);
-  background: rgba(0,242,234,0.04);
-}
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-.stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .handle {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+  }
 
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-}
+  .handle a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.stat svg { flex-shrink: 0; }
-.stat.likes { color: var(--pink); }
-.stat.views { color: #aaa; }
-.stat.comments { color: #aaa; }
-.stat.shares { color: #aaa; }
+  .handle .date {
+    font-size: 11px;
+    color: rgba(255,255,255,0.76);
+  }
 
-.card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  border: 1px solid var(--dim);
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  align-self: flex-start;
-}
+  .play-state {
+    background: rgba(0,0,0,0.44);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    backdrop-filter: blur(8px);
+  }
 
-.card-link:hover {
-  color: var(--pink);
-  border-color: var(--pink);
-  background: rgba(255,45,85,0.06);
-}
+  .info {
+    display: grid;
+    gap: 10px;
+    padding: 14px 14px 16px;
+    background: rgba(0,0,0,0.08);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
 
-.empty {
-  grid-column: 1/-1;
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--muted);
-}
+  .caption {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    word-break: break-word;
+  }
 
-.empty .icon { font-size: 48px; margin-bottom: 16px; }
-.empty h3 { font-size: 18px; font-weight: 500; margin-bottom: 6px; color: #555; }
-.empty p { font-size: 13px; }
+  .caption mark {
+    background: rgba(255,45,85,0.26);
+    color: #fff;
+    padding: 0 3px;
+    border-radius: 3px;
+  }
 
-.loading { grid-column: 1/-1; text-align: center; padding: 80px 20px; }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
 
-.spinner {
-  width: 36px; height: 36px;
-  border: 2px solid var(--border);
-  border-top-color: var(--pink);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
-}
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--soft);
+    font-size: 12px;
+    text-decoration: none;
+  }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+  .chip.cyan { color: var(--cyan); }
+  .chip.pink { color: var(--pink); }
 
-.error-banner {
-  max-width: 1100px;
-  margin: 20px auto;
-  padding: 0 24px;
-  position: relative;
-  z-index: 1;
-}
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 
-.error-box {
-  background: rgba(255,45,85,0.08);
-  border: 1px solid rgba(255,45,85,0.25);
-  border-radius: 10px;
-  padding: 16px 20px;
-  font-size: 13px;
-  color: #ff7096;
-  line-height: 1.6;
-}
+  .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--soft);
+    font-size: 12px;
+  }
 
-.error-box code {
-  background: rgba(255,255,255,0.06);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 12px;
-}
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .18s, transform .18s, background .18s;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0,242,234,0.4);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .btn.primary {
+    background: rgba(0,242,234,0.1);
+    border-color: rgba(0,242,234,0.35);
+  }
+
+  .btn.pink {
+    background: rgba(255,45,85,0.12);
+    border-color: rgba(255,45,85,0.34);
+  }
+
+  .status-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .status-pill {
+    font-size: 11px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .status-pill.good { color: var(--good); }
+  .status-pill.warn { color: var(--warn); }
+  .status-pill.cyan { color: var(--cyan); }
+
+  .feed-shell {
+    scroll-snap-type: y proximity;
+  }
+
+  .feed-shell .card {
+    min-height: 84vh;
+  }
+
+  .feed-shell .info {
+    padding-bottom: 18px;
+  }
+
+  .offline-banner, .error-banner {
+    max-width: 1280px;
+    margin: 12px auto 0;
+    padding: 0 18px;
+  }
+
+  .banner {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    color: var(--soft);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .banner strong { color: var(--text); }
+
+  .hidden { display: none !important; }
+
+  @media (min-width: 980px) {
+    .meta-row {
+      align-items: flex-start;
+    }
+  }
 </style>
 </head>
 <body>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-title">STASH</div>
+          <div class="brand-subtitle">TikTok Archive</div>
+        </div>
 
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">
-      STASH
-      <span>TikTok Archive</span>
+        <div class="search-wrap">
+          <div class="search">
+            <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
+            <input id="searchInput" type="text" placeholder="Search captions, hashtags, authors, music, mentions…" autocomplete="off">
+          </div>
+
+          <div class="controls">
+            <button class="toggle active" id="gridModeBtn" type="button">Grid</button>
+            <button class="toggle" id="feedModeBtn" type="button">Feed</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="controls">
+          <select id="authorFilter">
+            <option value="">All authors</option>
+          </select>
+
+          <select id="sortSelect">
+            <option value="likes">↓ Most liked</option>
+            <option value="views">↓ Most viewed</option>
+            <option value="comments">↓ Most commented</option>
+            <option value="shares">↓ Most shared</option>
+            <option value="favorites">↓ Most favorited</option>
+            <option value="date_desc">↓ Newest first</option>
+            <option value="date_asc">↑ Oldest first</option>
+          </select>
+
+          <select id="dateFilter">
+            <option value="">Any time</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 3 months</option>
+            <option value="365">Last year</option>
+          </select>
+
+          <button class="mini-btn" id="refreshBtn" type="button">Refresh</button>
+        </div>
+
+        <div class="meta-row">
+          <div class="status" id="statusBar">
+            <span class="badge cyan" id="resultsMeta">Loading…</span>
+            <span class="badge" id="modeMeta">Grid mode</span>
+            <span class="badge" id="cacheMeta">Cache inactive</span>
+          </div>
+          <div class="status">
+            <span class="badge good" id="publicLinkMeta">Public links ready</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="search-bar">
-      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-      </svg>
-      <input type="text" id="searchInput" placeholder="Search captions, hashtags, authors…" autocomplete="off">
+  </header>
+
+  <div class="offline-banner hidden" id="offlineBanner">
+    <div class="banner">
+      <strong>Offline mode:</strong> showing cached archive data. Video playback may fall back to posters or open-link buttons until the network comes back.
     </div>
   </div>
-</header>
 
-<div class="controls">
-  <select id="authorFilter">
-    <option value="">All authors</option>
-  </select>
-  <select id="sortSelect">
-    <option value="likes">↓ Most liked</option>
-    <option value="views">↓ Most viewed</option>
-    <option value="comments">↓ Most commented</option>
-    <option value="shares">↓ Most shared</option>
-    <option value="date_desc">↓ Newest first</option>
-    <option value="date_asc">↑ Oldest first</option>
-  </select>
-  <select id="dateFilter">
-    <option value="">Any time</option>
-    <option value="7">Last 7 days</option>
-    <option value="30">Last 30 days</option>
-    <option value="90">Last 3 months</option>
-    <option value="365">Last year</option>
-  </select>
-  <div class="results-meta" id="resultsMeta"></div>
-</div>
-
-<div id="errorBanner" class="error-banner" style="display:none">
-  <div class="error-box" id="errorBox"></div>
-</div>
-
-<div class="grid" id="grid">
-  <div class="loading">
-    <div class="spinner"></div>
-    <div style="color:var(--muted);font-size:13px;">Loading archive…</div>
+  <div class="error-banner hidden" id="errorBanner">
+    <div class="banner" id="errorBox"></div>
   </div>
+
+  <main class="results">
+    <div class="loading" id="loadingState">
+      <div>
+        <div class="skeleton-grid" aria-hidden="true">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+        <p style="margin-top:14px;">Loading archive…</p>
+      </div>
+    </div>
+
+    <section id="resultsShell" class="grid hidden"></section>
+  </main>
 </div>
 
 <script>
-let allItems = [];
+const DATA_URL = '../archive/search/search_index.json';
+const CACHE_KEY = 'tiktok-stash-search-cache-v4';
+const MODE_KEY = 'tiktok-stash-ui-mode-v2';
 
-function esc(s) {
-  return String(s ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+let allItems = [];
+let filteredItems = [];
+let currentMode = localStorage.getItem(MODE_KEY) || 'grid';
+let activeObserver = null;
+let activePlayingVideo = null;
+
+const els = {
+  loadingState: document.getElementById('loadingState'),
+  resultsShell: document.getElementById('resultsShell'),
+  searchInput: document.getElementById('searchInput'),
+  authorFilter: document.getElementById('authorFilter'),
+  sortSelect: document.getElementById('sortSelect'),
+  dateFilter: document.getElementById('dateFilter'),
+  resultsMeta: document.getElementById('resultsMeta'),
+  modeMeta: document.getElementById('modeMeta'),
+  cacheMeta: document.getElementById('cacheMeta'),
+  errorBanner: document.getElementById('errorBanner'),
+  errorBox: document.getElementById('errorBox'),
+  offlineBanner: document.getElementById('offlineBanner'),
+  gridModeBtn: document.getElementById('gridModeBtn'),
+  feedModeBtn: document.getElementById('feedModeBtn'),
+  refreshBtn: document.getElementById('refreshBtn')
+};
+
+function escHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-function escRe(s) {
-  return String(s ?? '').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function escAttr(value) {
+  return escHtml(value).replace(/`/g, '&#96;');
 }
 
 function fmt(n) {
-  n = Number(n);
-  if (!n || isNaN(n)) return '0';
-  if (n >= 1_000_000) return (n/1_000_000).toFixed(1)+'M';
-  if (n >= 1_000)     return (n/1_000).toFixed(1)+'K';
-  return String(n);
+  const num = Number(n);
+  if (!Number.isFinite(num) || num < 0) return '—';
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+  if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+  return String(num);
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  } catch {
+    return '';
+  }
 }
 
 function initials(name) {
-  return String(name ?? '?').slice(0,2).toUpperCase();
+  const s = String(name || '?').trim();
+  if (!s) return '?';
+  return s.slice(0, 2).toUpperCase();
 }
 
-function fmtDate(iso) {
-  if (!iso) return '';
-  try { return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
-  catch { return ''; }
+function normalizeList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.map(v => {
+      if (typeof v === 'string') return v.trim();
+      if (v && typeof v === 'object') {
+        return (v.name || v.title || v.text || v.username || v.id || '').toString().trim();
+      }
+      return '';
+    }).filter(Boolean);
+  }
+  if (typeof value === 'string') return value.trim() ? [value.trim()] : [];
+  if (value && typeof value === 'object') {
+    const c = value.name || value.title || value.text || value.username || value.id;
+    return c ? [String(c)] : [];
+  }
+  return [];
 }
 
-function styleCaption(text, query) {
-  if (!text) return '';
-  let s = esc(text);
-  s = s.replace(/#(\w+)/g,'<span class="hashtag">#$1</span>');
-  s = s.replace(/@(\w+)/g,'<span class="mention">@$1</span>');
-  if (query) {
-    const re = new RegExp(`(${escRe(query)})`,'gi');
-    s = s.replace(re,'<mark style="background:rgba(255,45,85,0.3);color:#fff;border-radius:2px;padding:0 1px">$1</mark>');
+function highlight(text, query) {
+  const safe = escHtml(text || '');
+  const q = String(query || '').trim();
+  if (!q) return safe;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  try {
+    return safe.replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+  } catch {
+    return safe;
   }
-  return s;
 }
 
-function renderCard(item, query) {
-  /* — read all fields from search_index.json — */
-  const author        = item.author        || 'Unknown';
-  const authorProfile = item.author_profile || ('https://tiktok.com/@' + encodeURIComponent(author));
-  const authorAvatar  = item.author_avatar  || '';
-  const caption       = item.caption        || '';
-  const url           = item.url            || '#';
-  const dateStr       = fmtDate(item.created_at);
+function getStat(item, key) {
+  const direct = item?.[key];
+  if (direct != null && Number.isFinite(Number(direct))) return Number(direct);
 
-  const likes    = Number(item.likes)    || 0;
-  const views    = Number(item.views)    || 0;
-  const comments = Number(item.comments) || 0;
-  const shares   = Number(item.shares)   || 0;
+  const stats = item?.stats || {};
+  const aliases = {
+    likes: ['likes', 'diggCount', 'digg'],
+    views: ['views', 'playCount'],
+    comments: ['comments', 'commentCount'],
+    shares: ['shares', 'shareCount'],
+    favorites: ['favorites', 'collectCount'],
+    reposts: ['reposts', 'repostCount']
+  };
 
-  const musicName   = item.music_name   || '';
-  const musicAuthor = item.music_author || '';
-  const musicUrl    = item.music_url    || '';
-  const musicCover  = item.music_cover  || '';
-  const videoCover  = item.video_cover_url || '';
-
-  const hashtags = Array.isArray(item.hashtags) ? item.hashtags : [];
-
-  /* thumbnail */
-  const thumbHtml = videoCover
-    ? `<img class="card-thumb" src="${esc(videoCover)}" alt="" loading="lazy"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-    : '';
-  const placeholderStyle = videoCover ? 'display:none' : 'display:flex';
-  const thumbPlaceholder = `<div class="card-thumb-placeholder" style="${placeholderStyle}">▶</div>`;
-
-  /* avatar */
-  const avatarHtml = authorAvatar
-    ? `<img class="avatar-img" src="${esc(authorAvatar)}" alt="${esc(author)}" loading="lazy"
-           onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'avatar-initials\\'>${esc(initials(author))}</div>')">`
-    : `<div class="avatar-initials">${esc(initials(author))}</div>`;
-
-  /* music */
-  let musicHtml = '';
-  if (musicName || musicAuthor) {
-    const coverHtml = musicCover
-      ? `<img class="music-cover" src="${esc(musicCover)}" alt="" loading="lazy"
-             onerror="this.outerHTML='<div class=\\'music-cover-placeholder\\'>🎵</div>'">`
-      : `<div class="music-cover-placeholder">🎵</div>`;
-    const titleHtml = musicUrl
-      ? `<a href="${esc(musicUrl)}" target="_blank" rel="noopener">${esc(musicName||'Sound')}</a>`
-      : esc(musicName || 'Sound');
-    musicHtml = `
-      <div class="music-row">
-        ${coverHtml}
-        <div class="music-text">
-          <div class="music-title">${titleHtml}</div>
-          <div class="music-artist">${esc(musicAuthor)}</div>
-        </div>
-      </div>`;
+  for (const candidate of aliases[key] || [key]) {
+    if (stats[candidate] != null && Number.isFinite(Number(stats[candidate]))) {
+      return Number(stats[candidate]);
+    }
   }
-
-  /* chips */
-  const chipsHtml = hashtags.length
-    ? `<div class="chips">${hashtags.map(t=>`<span class="chip">#${esc(String(t).replace(/^#/,''))}</span>`).join('')}</div>`
-    : '';
-
-  /* watch */
-  const watchHtml = url !== '#'
-    ? `<a class="card-link" href="${esc(url)}" target="_blank" rel="noopener">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-        </svg>Watch</a>`
-    : '';
-
-  return `
-<div class="card">
-  ${thumbHtml}${thumbPlaceholder}
-  <div class="card-body">
-    <div class="card-author">
-      ${avatarHtml}
-      <div class="author-name">
-        <a href="${esc(authorProfile)}" target="_blank" rel="noopener">@${esc(author)}</a>
-      </div>
-      <div class="card-date">${dateStr}</div>
-    </div>
-    <div class="card-caption">${styleCaption(caption, query)}</div>
-    ${musicHtml}
-    ${chipsHtml}
-    <div class="stats">
-      <div class="stat likes">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>${fmt(likes)}
-      </div>
-      <div class="stat views">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-        </svg>${fmt(views)}
-      </div>
-      <div class="stat comments">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-        </svg>${fmt(comments)}
-      </div>
-      <div class="stat shares">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 12h16"/><path d="M13 5l7 7-7 7"/>
-        </svg>${fmt(shares)}
-      </div>
-    </div>
-    ${watchHtml}
-  </div>
-</div>`;
+  return 0;
 }
 
-function render() {
-  const query  = document.getElementById('searchInput').value.trim().toLowerCase();
-  const author = document.getElementById('authorFilter').value;
-  const sort   = document.getElementById('sortSelect').value;
-  const days   = parseInt(document.getElementById('dateFilter').value) || 0;
+function getPlaybackUrl(item) {
+  const url = item?.video_storage_url || item?.public_link_url || item?.url || '';
+  return typeof url === 'string' ? url : '';
+}
 
-  let items = [...allItems];
-  if (query)  items = items.filter(i => (i.search_text||'').includes(query));
-  if (author) items = items.filter(i => i.author === author);
-  if (days) {
-    const cutoff = Date.now() - days * 86400000;
-    items = items.filter(i => i.created_at && new Date(i.created_at).getTime() >= cutoff);
+function getPosterUrl(item) {
+  return item?.video_cover_url || item?.music_cover || '';
+}
+
+function getAvatarUrl(item) {
+  return item?.author_avatar || '';
+}
+
+function getMusicUrl(item) {
+  return item?.music_url || '';
+}
+
+function getAuthorUrl(item) {
+  const author = item?.author || '';
+  if (item?.author_profile) return item.author_profile;
+  return author ? `https://www.tiktok.com/@${encodeURIComponent(author)}` : '#';
+}
+
+function getMentionUrl(mention) {
+  const clean = String(mention || '').replace(/^@/, '').trim();
+  return clean ? `https://www.tiktok.com/@${encodeURIComponent(clean)}` : '#';
+}
+
+function loadCachedIndex() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCachedIndex(items) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(items));
+    els.cacheMeta.textContent = 'Cache updated';
+  } catch {
+    els.cacheMeta.textContent = 'Cache limited';
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode === 'feed' ? 'feed' : 'grid';
+  localStorage.setItem(MODE_KEY, currentMode);
+
+  els.gridModeBtn.classList.toggle('active', currentMode === 'grid');
+  els.feedModeBtn.classList.toggle('active', currentMode === 'feed');
+  els.modeMeta.textContent = currentMode === 'feed' ? 'Feed mode' : 'Grid mode';
+
+  if (currentMode === 'feed') {
+    els.resultsShell.classList.remove('grid');
+    els.resultsShell.classList.add('feed', 'feed-shell');
+  } else {
+    els.resultsShell.classList.remove('feed', 'feed-shell');
+    els.resultsShell.classList.add('grid');
   }
 
-  items.sort((a,b) => {
-    if (sort === 'date_desc') return new Date(b.created_at||0) - new Date(a.created_at||0);
-    if (sort === 'date_asc')  return new Date(a.created_at||0) - new Date(b.created_at||0);
-    return (Number(b[sort])||0) - (Number(a[sort])||0);
-  });
-
-  document.getElementById('resultsMeta').innerHTML =
-    `<strong>${items.length}</strong> video${items.length!==1?'s':''}`;
-
-  const grid = document.getElementById('grid');
-  if (!items.length) {
-    grid.innerHTML = `<div class="empty"><div class="icon">🔍</div><h3>No results</h3><p>Try a different search or filter</p></div>`;
-    return;
-  }
-  grid.innerHTML = items.map((item,i) =>
-    renderCard(item,query).replace('class="card"',
-      `class="card" style="animation-delay:${Math.min(i*30,300)}ms"`)
-  ).join('');
+  render();
 }
 
 function populateAuthors() {
-  const authors = [...new Set(allItems.map(i=>i.author).filter(Boolean))].sort();
-  const sel = document.getElementById('authorFilter');
-  authors.forEach(a => {
-    const o = document.createElement('option');
-    o.value = a; o.textContent = '@'+a; sel.appendChild(o);
-  });
-}
-
-async function loadData() {
-  try {
-    const res = await fetch('../archive/search/search_index.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error('Not an array');
-    allItems = data;
-    populateAuthors();
-    render();
-  } catch(err) {
-    document.getElementById('errorBanner').style.display = 'block';
-    document.getElementById('errorBox').innerHTML =
-      `<strong>⚠ Could not load archive</strong><br><br>${esc(err.message)}<br><br>
-       Make sure <code>archive/search/search_index.json</code> is committed to the repo.`;
-    document.getElementById('grid').innerHTML = '';
-  }
-}
-
-document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('authorFilter').addEventListener('change', render);
-document.getElementById('sortSelect').addEventListener('change', render);
-document.getElementById('dateFilter').addEventListener('change', render);
-
-loadData();
-</script>
-</body>
-</html>
+  const authors = [...new Set(allItems.map(item => item.author).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const selected = els.authorFilter.value;
+  els.authorFilter.innerHTML = '<option value="">All author
