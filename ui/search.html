@@ -4,162 +4,227 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>TikTok Stash</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./stash.css">
-<style>
-  body { font-family: 'Nunito', -apple-system, 'Helvetica Neue', sans-serif; }
-</style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-inner">
-    <div class="top-bar">
-      <div class="brand">
-        <svg class="brand-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="48" height="48" rx="12" fill="#161616"/>
-          <path d="M31 14c.8 3.4 3.4 6 6 6.8v4.8c-2.2-.1-4.3-.8-6-2.2v10c0 5.5-4.5 10-10 10S11 38.9 11 33.4s4.5-10 10-10c.7 0 1.3.1 2 .2v4.9c-.6-.2-1.3-.3-2-.3-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5V14h5z" fill="url(#tg)"/>
-          <defs>
-            <linearGradient id="tg" x1="11" y1="14" x2="37" y2="44" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#25f4ee"/>
-              <stop offset="50%" stop-color="#ffffff"/>
-              <stop offset="100%" stop-color="#fe2c55"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span class="brand-name">STASH</span>
-      </div>
+<!-- ══ HEADER (grid mode; hides in feed) ══════════════════════════════════ -->
+<header class="app-header" id="appHeader">
+  <div class="hdr-top">
 
-      <div class="search-bar">
-        <span class="search-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.2" stroke-linecap="round">
-            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-          </svg>
-        </span>
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="Search videos, #hashtags, @authors…"
-          autocomplete="off"
-          spellcheck="false"
-        >
-        <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">×</button>
-      </div>
-
-      <div class="header-actions">
-        <div class="mode-tabs">
-          <button class="mode-tab active" id="gridModeTab" type="button">Grid</button>
-          <button class="mode-tab" id="feedModeTab" type="button">Feed</button>
-        </div>
-
-        <button class="pill" id="reloadBtn" type="button" title="Reload index from server">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-          </svg>
-          Reload
-        </button>
-
-        <button class="pill" id="clearBtn" type="button" style="display:none">
-          Clear filters
-        </button>
-      </div>
+    <!-- Logo -->
+    <div class="logo">
+      <svg class="logo-ico" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="12" fill="#161616"/>
+        <path d="M31 14c.8 3.4 3.4 6 6 6.8v4.8c-2.2-.1-4.3-.8-6-2.2v10
+                 c0 5.5-4.5 10-10 10S11 38.9 11 33.4s4.5-10 10-10
+                 c.7 0 1.3.1 2 .2v4.9c-.6-.2-1.3-.3-2-.3-2.8 0-5 2.2-5 5
+                 s2.2 5 5 5 5-2.2 5-5V14h5z" fill="url(#lg)"/>
+        <defs>
+          <linearGradient id="lg" x1="11" y1="14" x2="37" y2="44" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#25f4ee"/>
+            <stop offset="45%"  stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#fe2c55"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-txt">STASH</span>
     </div>
 
-    <div class="filter-bar">
-      <select id="authorFilter" class="pill">
+    <!-- Search -->
+    <div class="srch-wrap">
+      <span class="srch-ico">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </span>
+      <input id="searchInp" type="search" placeholder="Search videos, #tags, @authors…" autocomplete="off" spellcheck="false">
+      <button class="srch-clear" id="sClear" type="button" aria-label="Clear">×</button>
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="hdr-mode">
+      <button class="hdr-tab on" id="tabGrid" type="button">Grid</button>
+      <button class="hdr-tab"    id="tabFeed" type="button">Feed</button>
+    </div>
+
+  </div>
+
+  <!-- Filter strip -->
+  <div class="filter-row">
+    <label class="pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      <select id="authorSel" aria-label="Filter by author">
         <option value="">All authors</option>
       </select>
+    </label>
 
-      <select id="sortSelect" class="pill">
+    <label class="pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg>
+      <select id="sortSel" aria-label="Sort by">
         <option value="likes">Most liked</option>
         <option value="views">Most viewed</option>
         <option value="comments">Most commented</option>
         <option value="shares">Most shared</option>
         <option value="favorites">Most favorited</option>
-        <option value="date_desc">Newest first</option>
-        <option value="date_asc">Oldest first</option>
+        <option value="date_desc">Newest</option>
+        <option value="date_asc">Oldest</option>
       </select>
+    </label>
 
-      <select id="dateFilter" class="pill">
+    <label class="pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+      <select id="dateSel" aria-label="Time range">
         <option value="">Any time</option>
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
-        <option value="90">Last 3 months</option>
-        <option value="365">Last year</option>
+        <option value="7">7 days</option>
+        <option value="30">30 days</option>
+        <option value="90">3 months</option>
+        <option value="365">1 year</option>
       </select>
+    </label>
 
-      <div class="meta-row" style="margin-left:auto;flex-shrink:0">
-        <div class="meta-left">
-          <div class="live-dot" id="liveDot"></div>
-          <span id="cacheStatus" style="font-size:12px;color:var(--muted)">Loading</span>
-          <span style="font-size:12px;color:var(--muted)">·</span>
-          <span id="resultsMeta" style="font-size:12px;font-weight:700;color:var(--text)">—</span>
-        </div>
-      </div>
-    </div>
+    <button class="pill" id="reloadBtn" type="button" aria-label="Reload index">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.96 7.96 0 0012 4C7.58 4 4 7.58 4 12s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      Reload
+    </button>
   </div>
 </header>
 
-<div class="progress-rail" id="progressRail">
-  <div class="progress-fill" id="progressFill"></div>
+<!-- Progress bar -->
+<div class="prog-rail" id="progRail"><div class="prog-fill" id="progFill"></div></div>
+
+<!-- Banners -->
+<div class="banner warn hidden" id="offBanner">
+  <span><strong>Offline</strong> — showing cached data. Videos may not stream.</span>
+  <button class="banner-x" id="offX" type="button">×</button>
+</div>
+<div class="banner err hidden" id="errBanner">
+  <span id="errMsg"></span>
+  <button class="banner-x" id="errX" type="button">×</button>
 </div>
 
-<div class="body-offset">
-  <div class="banner-slot">
-    <div class="banner-box warn hidden" id="offlineBanner">
-      <span><strong>Offline mode</strong> — showing cached data. Videos may not play.</span>
-      <button class="banner-dismiss" type="button" onclick="this.closest('.banner-box').classList.add('hidden')">×</button>
-    </div>
-    <div class="banner-box error hidden" id="errorBanner">
-      <span id="errorMsg"></span>
-    </div>
+<!-- Active hashtag bar -->
+<div class="tag-bar" id="tagBar"></div>
+
+<!-- ══ GRID VIEW ═══════════════════════════════════════════════════════════ -->
+<div class="grid-root hidden" id="gridRoot">
+
+  <!-- Skeleton -->
+  <div class="skel-grid hidden" id="skelWrap">
+    <div class="skel-c"></div><div class="skel-c"></div><div class="skel-c"></div>
+    <div class="skel-c"></div><div class="skel-c"></div><div class="skel-c"></div>
   </div>
 
-  <div class="tag-strip" id="tagStrip"></div>
-
-  <div class="recent-panel hidden" id="recentPanel" style="margin-top:12px">
-    <div class="recent-label">Recent searches</div>
-    <div class="recent-chips" id="recentChips"></div>
+  <!-- Meta row -->
+  <div class="grid-meta">
+    <span class="g-count" id="gCount">—</span>
+    <span class="g-net">
+      <span class="live-dot" id="liveDot"></span>
+      <span id="netLbl" style="font-size:11px;color:var(--muted)">—</span>
+    </span>
   </div>
 
-  <div class="analytics-panel hidden" id="analyticsWrap" style="margin-top:12px"></div>
-
-  <div class="skeleton-grid hidden" id="skeletonWrap" style="margin-top:12px">
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
-    <div class="skeleton-card"></div>
+  <!-- Recent searches -->
+  <div class="recent-wrap hidden" id="recentWrap">
+    <div class="recent-lbl">Recent searches</div>
+    <div class="recent-chips" id="recentRow"></div>
   </div>
 
-  <div class="grid-view hidden" id="gridView" style="margin-top:12px">
-    <div class="video-grid" id="videoGrid"></div>
+  <!-- Analytics dashboard -->
+  <div class="dash hidden" id="dashWrap">
+    <div class="dash-ttl">Archive at a glance</div>
+    <div class="dash-grid" id="dashGrid"></div>
+    <div class="top-tags" id="topTags"></div>
   </div>
-</div>
 
-<div class="feed-view hidden" id="feedView">
-  <div class="feed-spacer-top" id="feedSpacerTop"></div>
+  <!-- The actual grid -->
+  <div class="video-grid" id="vGrid"></div>
+
+</div><!-- /grid-root -->
+
+<!-- ══ FEED VIEW (fixed full-screen) ═══════════════════════════════════════ -->
+<div class="feed-root hidden" id="feedRoot">
+  <div class="f-spacer" id="feedTop"></div>
   <div id="feedItems"></div>
-  <div class="feed-spacer-bottom" id="feedSpacerBot"></div>
+  <div class="f-spacer" id="feedBot"></div>
 </div>
 
-<button class="back-top hidden" id="backTop" type="button" aria-label="Back to top">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
-  </svg>
+<!-- ══ BOTTOM NAV ══════════════════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn on" id="navHome" type="button" aria-label="Feed">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Feed
+  </button>
+  <button class="nav-btn on" id="navGrid" type="button" aria-label="Browse">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/></svg>
+    Browse
+  </button>
+  <button class="nav-center-btn nav-btn" id="navPlus" type="button" aria-label="Surprise me">
+    <div class="nav-plus">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+  </button>
+  <button class="nav-btn" id="navExport" type="button" aria-label="Export">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    Export
+  </button>
+  <button class="nav-btn" id="navSettings" type="button" aria-label="Settings" onclick="alert('Settings coming soon')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a6.986 6.986 0 00-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.37 1.04.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- Floating back-to-top (grid only) -->
+<button class="fab hidden" id="fab" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
 </button>
 
-<button class="surprise-btn" id="surpriseBtn" type="button" aria-label="Random video">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.65 3.35A7.958 7.958 0 0012 1C7.03 1 3 5.03 3 10s4.03 9 9 9c4.07 0 7.5-2.71 8.58-6.43l-1.94-.52C17.75 14.9 15.07 17 12 17c-3.87 0-7-3.13-7-7s3.13-7 7-7c1.93 0 3.68.79 4.95 2.05L14 8h7V1l-3.35 2.35z"/>
-    <circle cx="12" cy="10" r="2"/>
-  </svg>
-  <span>Surprise me</span>
-</button>
+<!-- ══ EXPORT SHEET ══════════════════════════════════════════════════════════ -->
+<div class="sheet-bg hidden" id="sheetBg">
+  <div class="sheet">
+    <div class="sheet-knob"></div>
+    <div class="sheet-ttl">Export archive</div>
+
+    <div class="s-row" id="exportJSON">
+      <div class="s-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+      </div>
+      <div>
+        <div class="s-txt">Export as JSON</div>
+        <div class="s-sub">Full metadata for current filter</div>
+      </div>
+    </div>
+
+    <div class="s-row" id="exportCSV">
+      <div class="s-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3l5 3-5 3V6zm-1 10H6v-2h5v2zm0-4H6v-2h5v2zm0-4H6V6h5v2z"/></svg>
+      </div>
+      <div>
+        <div class="s-txt">Export as CSV</div>
+        <div class="s-sub">Stats table for spreadsheets</div>
+      </div>
+    </div>
+
+    <div class="s-row" id="copyLinks">
+      <div class="s-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+      </div>
+      <div>
+        <div class="s-txt">Copy all public links</div>
+        <div class="s-sub">One URL per line to clipboard</div>
+      </div>
+    </div>
+
+    <div class="s-row" id="sheetClose" style="justify-content:center;padding:14px 0 0;border-bottom:none">
+      <span style="color:var(--muted);font-size:14px">Cancel</span>
+    </div>
+  </div>
+</div>
 
 <script src="./stash.js"></script>
 </body>
-</html>
+  </html>
