@@ -1,9 +1,9 @@
 import os
 
 PRIVATE_FILES = {
-    "archive/system/state.json": "_private/state.json",
-    "archive/system/retry_queue.json": "_private/retry_queue.json",
-    "archive/system/log.json": "_private/log.json",
+    "archive/private/state.json": "private/state.json",
+    "archive/private/retry_queue.json": "private/retry_queue.json",
+    "archive/private/log.json": "private/log.json",
 }
 
 
