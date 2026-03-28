@@ -134,6 +134,8 @@ def build_index():
 
             "local_video_size": state_item.get("local_video_size") or item.get("local_video_size"),
             "local_video_sha256": state_item.get("local_video_sha256") or item.get("local_video_sha256"),
+            "local_metadata_size": state_item.get("local_metadata_size") or item.get("local_metadata_size"),
+            "local_metadata_sha256": state_item.get("local_metadata_sha256") or item.get("local_metadata_sha256"),
             "remote_video_size": state_item.get("remote_video_size") or item.get("remote_video_size"),
             "remote_metadata_size": state_item.get("remote_metadata_size") or item.get("remote_metadata_size"),
 
