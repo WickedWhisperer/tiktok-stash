@@ -161,7 +161,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "disabled",
@@ -173,9 +173,7 @@
     "remote_metadata_size": 10462,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:06:54.970769",
-    "local_video_size": 1528479,
-    "local_video_sha256": "b1af19feab3ebabe73b2be4d8127bcc860838288d2874fb8acb045087ccd3dcc"
+    "last_checked_at": "2026-03-28T05:08:19.723644"
   },
   {
     "id": "7620164000902417666",
@@ -352,7 +350,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:06:54.971039"
+    "last_checked_at": "2026-03-28T05:08:19.723255"
   },
   {
     "id": "7619757123131559190",
@@ -529,7 +527,7 @@
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:06:54.971143"
+    "last_checked_at": "2026-03-28T05:08:19.723599"
   },
   {
     "id": "7619389482399255830",
@@ -687,7 +685,7 @@
     "remote_metadata_size": 6453,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:06:57.429021"
+    "last_checked_at": "2026-03-28T05:08:22.328283"
   },
   {
     "id": "7618315955151605014",
@@ -845,6 +843,6 @@
     "remote_metadata_size": 6463,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T05:06:58.263878"
+    "last_checked_at": "2026-03-28T05:08:22.617145"
   }
 ]
