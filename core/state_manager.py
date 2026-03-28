@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-STATE_FILE = "archive/system/state.json"
+STATE_FILE = "archive/private/state.json"
 
 
 def load_state():
