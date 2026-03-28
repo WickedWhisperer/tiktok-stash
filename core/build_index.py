@@ -6,7 +6,7 @@ INPUT_FILE = "archive/derived/enriched_archive.json"
 if not os.path.exists(INPUT_FILE):
     INPUT_FILE = "archive/derived/normalized_archive.json"
 
-STATE_FILE = "archive/system/state.json"
+STATE_FILE = "archive/private/state.json"
 OUTPUT_FILE = "archive/search/search_index.json"
 
 
@@ -143,6 +143,8 @@ def build_index():
             "views": stats.get("views", 0),
             "comments": stats.get("comments", 0),
             "shares": stats.get("shares", 0),
+            "favorites": stats.get("favorites", 0),
+            "reposts": stats.get("reposts", 0),
 
             "hashtags": hashtags,
             "mentions": mentions,
