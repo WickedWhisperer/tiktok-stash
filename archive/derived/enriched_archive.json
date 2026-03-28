@@ -161,7 +161,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "created",
@@ -173,11 +173,7 @@
     "remote_metadata_size": 9894,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T07:16:56.449730",
-    "local_video_size": 1528479,
-    "local_video_sha256": "b1af19feab3ebabe73b2be4d8127bcc860838288d2874fb8acb045087ccd3dcc",
-    "local_metadata_size": 9894,
-    "local_metadata_sha256": "d1d35f4dd23f0683a70f93dc1e071c6af1c3bf75deab2b33d89cc4bc05444fda"
+    "last_checked_at": "2026-03-28T07:17:59.155927"
   },
   {
     "id": "7620164000902417666",
@@ -342,7 +338,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "created",
@@ -354,11 +350,7 @@
     "remote_metadata_size": 8882,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T07:16:56.449374",
-    "local_video_size": 1718928,
-    "local_video_sha256": "759638146c07cbb1e95407522881c982ec7ba98d9abac70f022fefaefb860231",
-    "local_metadata_size": 8882,
-    "local_metadata_sha256": "a9da77b67db64cf4bc33e772ce2c8f453bf4088732e0f3b889bbe51324abaf73"
+    "last_checked_at": "2026-03-28T07:17:59.155605"
   },
   {
     "id": "7619757123131559190",
@@ -523,7 +515,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "created",
@@ -535,11 +527,7 @@
     "remote_metadata_size": 8882,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T07:16:56.449670",
-    "local_video_size": 1429489,
-    "local_video_sha256": "7c000803161137a1341341763f98284ac81d1d0883b5d6da8982da87ec933c38",
-    "local_metadata_size": 8882,
-    "local_metadata_sha256": "2a2fd785e5d3e06b291b585ff345a12601e35aa43025150a6fbe2c51199e263c"
+    "last_checked_at": "2026-03-28T07:17:59.157557"
   },
   {
     "id": "7619389482399255830",
@@ -685,7 +673,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "created",
@@ -697,11 +685,7 @@
     "remote_metadata_size": 6587,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T07:17:03.656740",
-    "local_video_size": 2119960,
-    "local_video_sha256": "dd3cde98ea7b3e139ede8f697fa8005692f380cc23e5c4c65dd66f39fb18180c",
-    "local_metadata_size": 6587,
-    "local_metadata_sha256": "79adb00713b0d0545cc9b24ae10185cb372b3e67505d5308170222a2d3fdbf83"
+    "last_checked_at": "2026-03-28T07:18:02.103926"
   },
   {
     "id": "7618315955151605014",
@@ -847,7 +831,7 @@
       "fromProfileSection": "videos",
       "commentsDatasetUrl": null
     },
-    "download_status": "completed",
+    "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
     "public_link_status": "created",
@@ -859,10 +843,6 @@
     "remote_metadata_size": 6597,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T07:17:04.838144",
-    "local_video_size": 2757734,
-    "local_video_sha256": "4246a748ac8faeef421e23fec65d03ccffb74a97e0d4b1858e2d9e9497450ed7",
-    "local_metadata_size": 6597,
-    "local_metadata_sha256": "7b00ed8179eb5d8e60bc799cf5063aea1ba82f214b8715263760b2146e274f9b"
+    "last_checked_at": "2026-03-28T07:18:02.499559"
   }
 ]
