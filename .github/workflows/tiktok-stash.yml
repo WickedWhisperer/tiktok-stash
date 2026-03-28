@@ -28,12 +28,12 @@ jobs:
           mkdir -p archive/derived
           mkdir -p archive/search
           mkdir -p archive/private
+          mkdir -p archive/media
 
       - name: Remove legacy runtime folders
         run: |
-          rm -rf archive/media || true
-          rm -rf archive/meta || true
           rm -rf archive/system || true
+          rm -rf archive/meta || true
           rm -rf archive/videos || true
 
       - name: Set up Python
@@ -80,59 +80,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add archive/raw archive/derived archive/search
-          git commit -m "Update archive (stateful sync)" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Setup rclone
-        uses: AnimMouse/setup-rclone@v1
-        with:
-          rclone_config: ${{ secrets.RCLONE_CONFIG }}
-
-      - name: Verify rclone
-        run: rclone listremotes
-
-      - name: Run collector
-        run: python -m main
-
-      - name: Normalize
-        run: python -m core.normalize
-
-      - name: Download + Upload + Enrich
-        run: python -m core.download_step
-
-      - name: Build index
-        run: python -m core.build_index
-
-      - name: Commit and push
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add archive/raw archive/derived archive/search
-          git commit -m "Update archive (stateful sync)" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
-      - name: Verify rclone
-        run: rclone listremotes
-
-      - name: Run collector
-        run: python main.py
-
-      - name: Normalize
-        run: python -m core.normalize
-
-      - name: Download + Upload + Enrich
-        run: python -m core.download_step
-
-      - name: Build index
-        run: python -m core.build_index
-
-      - name: Commit and push
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add archive/
           git commit -m "Update archive (stateful sync)" || echo "No changes"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
