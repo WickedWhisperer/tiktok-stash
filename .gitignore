@@ -1,12 +1,7 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
 *$py.class
 
-# C extensions
-*.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,11 +21,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+*.so
+*.manifest
+*.spec
 
-# Unit test / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -45,9 +39,21 @@ coverage.xml
 .pytest_cache/
 cover/
 
-# Environments
-.env
-.envrc
+*.mo
+*.pot
+
+instance/
+.webassets-cache
+.scrapy
+docs/_build/
+.pybuilder/
+target/
+
+.ipynb_checkpoints
+
+profile_default/
+ipython_config.py
+
 .venv
 env/
 venv/
@@ -55,25 +61,26 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDEs and editors
 .spyderproject
 .spyproject
 .ropeproject
 .idea/
 .vscode/
-.cursorignore
-.cursorindexingignore
-
-# Python packaging tools
+.ruff_cache/
 .pdm-python
 .pdm-build/
 .pypirc
 
-# Jupyter
-.ipynb_checkpoints
+.cursorignore
+.cursorindexingignore
 
-# Project runtime data that should stay private
-archive/system/
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
 archive/private/
 archive/media/
+archive/system/
+archive/meta/
+archive/videos/
 archive/downloaded.txt
