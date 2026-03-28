@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import time
 from typing import Dict, Optional, Tuple
@@ -35,6 +36,23 @@ class RcloneStorageProvider:
 
         return False
 
+    def download_file(self, relative_remote_path: str, local_path: str, retries: int = 3, delay: int = 5) -> bool:
+        for attempt in range(retries):
+            result = self._run([
+                "rclone",
+                "copyto",
+                self.remote_file(relative_remote_path),
+                local_path,
+            ])
+
+            if result.returncode == 0:
+                return True
+
+            print(f"Download attempt {attempt + 1} failed: {result.stderr.strip()}")
+            time.sleep(delay)
+
+        return False
+
     def file_info(self, relative_remote_path: str) -> Tuple[bool, Optional[Dict], Optional[str]]:
         result = self._run([
             "rclone",
@@ -61,7 +79,7 @@ class RcloneStorageProvider:
         if not exists:
             return False, None, error
 
-        if info and isinstance(info, dict):
+        if info and isinstance(info, dict) and os.path.exists(local_path):
             remote_size = info.get("Size")
             if remote_size is not None:
                 try:
