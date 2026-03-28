@@ -164,16 +164,16 @@
     "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
-    "public_link_status": "disabled",
+    "public_link_status": "created",
     "video_storage_path": "flamrzz/7620870073321868566/video.mp4",
     "metadata_storage_path": "flamrzz/7620870073321868566/metadata.json",
-    "video_storage_url": "flamrzz/7620870073321868566/video.mp4",
-    "public_link_url": null,
+    "video_storage_url": "https://mega.co.nz/#!rAYgDYBQ!TKXSbHJpZDfG1qBnqoa22xsQQuRNfDgGxC8u0cF9dWw",
+    "public_link_url": "https://mega.co.nz/#!rAYgDYBQ!TKXSbHJpZDfG1qBnqoa22xsQQuRNfDgGxC8u0cF9dWw",
     "remote_video_size": 1528479,
     "remote_metadata_size": 10462,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T06:06:33.472899"
+    "last_checked_at": "2026-03-28T07:11:54.218723"
   },
   {
     "id": "7620164000902417666",
@@ -341,16 +341,16 @@
     "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
-    "public_link_status": "disabled",
+    "public_link_status": "created",
     "video_storage_path": "flamrzz/7620164000902417666/video.mp4",
     "metadata_storage_path": "flamrzz/7620164000902417666/metadata.json",
-    "video_storage_url": "tiktok-archive/flamrzz/7620164000902417666/video.mp4",
-    "public_link_url": null,
+    "video_storage_url": "https://mega.co.nz/#!Wc4QHabZ!cGFzzXZO1NuSMH4fw-OfqmoR_6RkrJACs3oIeLlXvNc",
+    "public_link_url": "https://mega.co.nz/#!Wc4QHabZ!cGFzzXZO1NuSMH4fw-OfqmoR_6RkrJACs3oIeLlXvNc",
     "remote_video_size": 1718928,
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T06:06:33.472374"
+    "last_checked_at": "2026-03-28T07:11:54.218134"
   },
   {
     "id": "7619757123131559190",
@@ -518,16 +518,16 @@
     "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
-    "public_link_status": "disabled",
+    "public_link_status": "created",
     "video_storage_path": "flamrzz/7619757123131559190/video.mp4",
     "metadata_storage_path": "flamrzz/7619757123131559190/metadata.json",
-    "video_storage_url": "tiktok-archive/flamrzz/7619757123131559190/video.mp4",
-    "public_link_url": null,
+    "video_storage_url": "https://mega.co.nz/#!uQhh0ayT!B3gq-QBXkkoGV9u03kkfL2j4aUN4PXJxfb8LMNNNKhE",
+    "public_link_url": "https://mega.co.nz/#!uQhh0ayT!B3gq-QBXkkoGV9u03kkfL2j4aUN4PXJxfb8LMNNNKhE",
     "remote_video_size": 1429489,
     "remote_metadata_size": 8748,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T06:06:33.473305"
+    "last_checked_at": "2026-03-28T07:11:54.219028"
   },
   {
     "id": "7619389482399255830",
@@ -676,16 +676,16 @@
     "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
-    "public_link_status": "disabled",
+    "public_link_status": "created",
     "video_storage_path": "flamrzz/7619389482399255830/video.mp4",
     "metadata_storage_path": "flamrzz/7619389482399255830/metadata.json",
-    "video_storage_url": "tiktok-archive/flamrzz/7619389482399255830/video.mp4",
-    "public_link_url": null,
+    "video_storage_url": "https://mega.co.nz/#!zE4jxALT!cLqvKiiNZGIyU9HObWUL1SgYpSRAj_cfSgAzckzl5E8",
+    "public_link_url": "https://mega.co.nz/#!zE4jxALT!cLqvKiiNZGIyU9HObWUL1SgYpSRAj_cfSgAzckzl5E8",
     "remote_video_size": 2119960,
     "remote_metadata_size": 6453,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T06:06:35.937822"
+    "last_checked_at": "2026-03-28T07:11:58.163000"
   },
   {
     "id": "7618315955151605014",
@@ -834,15 +834,15 @@
     "download_status": "skipped",
     "upload_status": "completed",
     "verification_status": "verified",
-    "public_link_status": "disabled",
+    "public_link_status": "created",
     "video_storage_path": "flamrzz/7618315955151605014/video.mp4",
     "metadata_storage_path": "flamrzz/7618315955151605014/metadata.json",
-    "video_storage_url": "tiktok-archive/flamrzz/7618315955151605014/video.mp4",
-    "public_link_url": null,
+    "video_storage_url": "https://mega.co.nz/#!eBBWSB7S!Z-pJTnBUYXdkPWbWk2jeC2epzQt4RtkDdNiWNfku2UQ",
+    "public_link_url": "https://mega.co.nz/#!eBBWSB7S!Z-pJTnBUYXdkPWbWk2jeC2epzQt4RtkDdNiWNfku2UQ",
     "remote_video_size": 2757734,
     "remote_metadata_size": 6463,
     "is_available": true,
     "last_error": null,
-    "last_checked_at": "2026-03-28T06:06:36.180441"
+    "last_checked_at": "2026-03-28T07:11:58.421433"
   }
 ]
