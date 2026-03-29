@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+*.log
+*.tmp
+*.swp
+.env
+dist/
+build/
+.venv/
+venv/
+input/
+tiktok/
+mirror/
+file_log.json
